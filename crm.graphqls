@@ -18,6 +18,11 @@ enum Language {
 	ENGLISH
 }
 
+enum ContactType {
+	INDIVIDUAL,
+	ORGANIZATION
+}
+
 enum ActivityType {
 	CALL,
 	LETTER,
@@ -34,6 +39,10 @@ interface BaseContact {
 	# Unique numerical identifier of the contact.
 	id: ID,
 
+	# API DEV : This is not the screen_name. Use "FirstName LastName" for Individual AND "screen_name" for Organization
+	# Display name of the contact.
+	displayName: String
+
 	# First name of the contact.
 	firstName: String,
 
@@ -43,11 +52,18 @@ interface BaseContact {
 	# Last name of the contact.
 	lastName: String,
 
-	# Translated classes of the contact.
-	classes: [String],
+	# Idividual/Organization indicator
+	contactType: ContactType,
+
+	# Contact classes
+	classes: [FieldValue],
 
 	# Picture URL location of the contact.
 	picture: String
+
+	# API DEV : IA Only. Leave blank for others
+	# Contact rank
+	rank: String
 }
 
 interface BaseActivity {
@@ -68,10 +84,27 @@ interface BaseActivity {
 	allDay: Boolean!,
 
 	# Date & time when the activity starts.
-	dateExpectedStart: DateTime,
+	dateStart: DateTime,
 
 	# Date & time when the activity ends.
-	dateExpectedEnd: DateTime
+	dateEnd: DateTime
+}
+
+type FieldValue {
+
+	# Unique numerical identifier of the Field Value.
+	id: ID,
+
+	# French value
+	fr: String!,
+
+	# English value
+	en: String!,
+
+	# DEV: system_name lorsque pertinant
+	# System Code
+	code: String
+
 }
 
 
@@ -81,7 +114,6 @@ type PaginationAnswer {
 	# Current page. Default is 1.
 	page: Int,
 
-	# ToDo: Per page limits are okay?
 	# Results per page. Can only be 10, 25, 50 or 100.
 	perPage: Int,
 
@@ -120,10 +152,10 @@ type Address {
 
 	# API DEV: Is a vdvalue
 	# Translated type of the address.
-	type: String,
+	type: FieldValue!,
 
 	# First line of the address.
-	line1: String,
+	line1: String!,
 
 	# Second line of the address.
 	line2: String,
@@ -148,15 +180,15 @@ type Phone {
 	main: Boolean!,
 
 	# API DEV: vdvalue with vd_type_phone
-	# Translated type of the phone.
-	type: String,
+	# Type of the phone.
+	type: FieldValue!,
 
 	# Actual phone number. The extension is included in it.
-	number: String,
+	number: String!,
 
 	# API DEV: If longDistance is null, assume it is not the main address
 	# True if the number is considered long distance.
-	longDistance: Boolean!,
+	longDistance: Boolean,
 
 	# Notes of the phone number.
 	notes: String
@@ -172,11 +204,11 @@ type Email {
 	main: Boolean!,
 
 	# API DEV: vd_type_email
-	# Translated type of the email address.
-	type: String,
+	# Type of the email address.
+	type: FieldValue!,
 
 	# Actual email address.
-	email: String,
+	email: String!,
 
 	# Notes of the email address.
 	notes: String
@@ -187,6 +219,9 @@ type ListContact implements BaseContact {
 	# Unique numerical identifier of the contact.
 	id: ID,
 
+	# Display name of the contact.
+	displayName: String
+
 	# First name of the contact.
 	firstName: String,
 
@@ -196,9 +231,12 @@ type ListContact implements BaseContact {
 	# Last name of the contact.
 	lastName: String,
 
+	# Idividual/Organization indicator
+	contactType: ContactType,
+
 	# API DEV: Fetch with i_contact_class, it uses vdvalues too
-	# Translated classes of the contact.
-	classes: [String],
+	# Contact classes
+	classes: [FieldValue],
 
 	# API DEV: Through fk_document_picture, it should be possible to fetch a public URL
 	# Picture URL of the contact.
@@ -209,7 +247,10 @@ type ListContact implements BaseContact {
 type DetailedContact implements BaseContact {
 	# Unique numerical identifier of the contact.
 	id: ID,
-	
+
+	# Display name of the contact.
+	displayName: String
+
 	# First name of the contact.
 	firstName: String,
 
@@ -219,25 +260,23 @@ type DetailedContact implements BaseContact {
 	# Last name of the contact.
 	lastName: String
 
-	# API DEV: This is named screen_name in the database.
-	# ToDo: Is this still necessary?
-	# Display name of the contact.
-	displayName: String
+	# Idividual/Organization indicator
+	contactType: ContactType,
 
 	# Decease date of the contact.
 	dateDecease: Date,
 
 	# API DEV: If smoker is null, assume false
-	# True if the contact is a smoker.
+	# True if the contact is a smoker. (finance only)
 	smoker: Boolean!,
 
-	# Date when the contact was no longer considered a smoker.
+	# Date when the contact was no longer considered a smoker. (finance only)
 	smokerDateEnd: Date,
 
 	# API DEV: In marital_status table, must do a TOP 1 query to fetch it, and it can be NULL
 	# API DEV: civilStatus is in vdvalues (vd_marital_status)
 	# Translated civil status of the contact.
-	civilStatus: String,
+	civilStatus: FieldValue,
 
 	# API DEV: civilStatusSince is date_start of marital_status
 	# Date since the current civil status is active.
@@ -248,21 +287,21 @@ type DetailedContact implements BaseContact {
 	job: Job,
 
 	# API DEV: Fetch with i_contact_class, it uses vdvalues too
-	# Translated classes of the contact.
-	classes: [String],
+	# Contact classes
+	classes: [FieldValue],
 
 	# API DEV: Fetch with vdvalues (vd_territory)
-	# Translated territory name of the contact.
-	territory: String,
+	# Translated territory name of the contact. (finance only)
+	territory: FieldValue,
 
 	# API DEV: Segments must be fetched with vd_seg# and vdvalues
-	# Segments 1-6. Translated values.
-	seg1: String,
-	seg2: String,
-	seg3: String,
-	seg4: String,
-	seg5: String,
-	seg6: String,
+	# Segments 1-6. Translated values. (finance only)
+	seg1: FieldValue,
+	seg2: FieldValue,
+	seg3: FieldValue,
+	seg4: FieldValue,
+	seg5: FieldValue,
+	seg6: FieldValue,
 
 	# API DEV: Through fk_document_picture, it should be possible to fetch a public URL
 	# Picture URL of the contact.
@@ -287,10 +326,10 @@ type DetailedContact implements BaseContact {
 	# Activities of the contact. Can be sorted.
 	activities(pagination: PaginationParameters, filters: ActivityListFilters!, userContext: UserContext): ActivityList!,
 
-	# Investments, or plans of the contact.
+	# Investments, or plans of the contact. (finance only)
 	plans: [AccountPlan!]!,
 
-	# Insurance policies of the contact.
+	# Insurance policies of the contact. (finance only)
 	policies: [InsurancePolicy!]!
 }
 
@@ -323,10 +362,13 @@ type ListActivity implements BaseActivity {
 	allDay: Boolean!,
 
 	# Date & time when the activity starts.
-	dateExpectedStart: DateTime,
+	dateStart: DateTime,
 
 	# Date & time when the activity ends.
-	dateExpectedEnd: DateTime
+	dateEnd: DateTime
+
+	# Translated location name of the activity.
+	location: String,
 }
 
 # Complete representation of an activity.
@@ -350,10 +392,10 @@ type DetailedActivity implements BaseActivity {
 	allDay: Boolean!,
 
 	# Date & time when the activity starts.
-	dateExpectedStart: DateTime,
+	dateStart: DateTime,
 
 	# Date & time when the activity ends.
-	dateExpectedEnd: DateTime,
+	dateEnd: DateTime,
 
 	# Translated location name of the activity.
 	location: String,
@@ -368,23 +410,28 @@ type DetailedActivity implements BaseActivity {
 
 # Defines an account plan entity. Cannot be modified.
 type AccountPlan {
+
+	# Plan description including type
+	description: String,
+
 	# Last updated date of the plan.
 	marketValueUpdatedAt: Date,
 
 	# Current market value for the plan.
 	marketValue: Float,
 
+	# DEV: vd_account_type_valid
 	# Plan's account type, which is the main category.
-	accountType: String,
+	accountType: FieldValue,
 
 	# Account category. This value is translated.
-	accountCategory: String
+	accountCategory: FieldValue
 }
 
 # Defines an insurance policy entity. Cannot be modified.
 type InsurancePolicy {
 	# Policy's line of business.
-	lineOfBusiness: String,
+	lineOfBusiness: FieldValue,
 
 	# Policy insurer name.
 	carrier: String,
@@ -398,6 +445,7 @@ type InsurancePolicy {
 	# Policy annual premium.
 	annualPremium: Float,
 
+	# Todo: à discuter
 	# Policy benefits amount.
 	benefits: Float,
 
@@ -441,6 +489,9 @@ input UserContext {
 input ActivityListFilters {
 	# The activities need to be contained in the specified activity types in order to be displayed. This filter is mandatory.
 	agendaTypeIn: [ActivityType!]!
+
+	# If specified, filter activity based on completed flag.
+	isCompleted: Boolean
 }
 
 # Filters input of the contacts list.
