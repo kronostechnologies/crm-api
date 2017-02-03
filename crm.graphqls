@@ -55,8 +55,8 @@ interface BaseContact {
 	# Idividual/Organization indicator
 	contactType: ContactType,
 
-	# Contact classes
-	classes: [FieldValue],
+	# Contact categories
+	categories: [FieldValue],
 
 	# Picture URL location of the contact.
 	picture: String
@@ -235,8 +235,8 @@ type ListContact implements BaseContact {
 	contactType: ContactType,
 
 	# API DEV: Fetch with i_contact_class, it uses vdvalues too
-	# Contact classes
-	classes: [FieldValue],
+	# Contact categories
+	categories: [FieldValue],
 
 	# API DEV: Through fk_document_picture, it should be possible to fetch a public URL
 	# Picture URL of the contact.
@@ -287,8 +287,24 @@ type DetailedContact implements BaseContact {
 	job: Job,
 
 	# API DEV: Fetch with i_contact_class, it uses vdvalues too
-	# Contact classes
-	classes: [FieldValue],
+	# Contact categories
+	categories: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+	# Contact distribution lists
+	distributionLists: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+	# Contact origins
+	refferedBy: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+	# Contact hobbies
+	hobbies: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+	# Contact i_contact_activity_domain
+	industries: [FieldValue],
 
 	# API DEV: Fetch with vdvalues (vd_territory)
 	# Translated territory name of the contact. (finance only)
@@ -313,6 +329,10 @@ type DetailedContact implements BaseContact {
 
 	# Birth date of the contact.
 	birthDate: Date,
+
+	# DEV: identification_customer_no
+	# Client #
+	clientNb: String,
 
 	# Addresses of the contact.
 	adresses: [Address],
