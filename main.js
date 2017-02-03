@@ -7,6 +7,7 @@ const myMockServer = graphQLTools.mockServer(schemaContent);
 myMockServer.query(`{
   contact (id: 1) {
   	id,
+  	displayName,
   	activities (filters: { agendaTypeIn: [CALL, MEETING] }) {
   		items {
   			id

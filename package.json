@@ -1,7 +1,7 @@
 {
   "scripts": {
     "default": "node main.js",
-    "nodemon": "./node_modules/.bin/nodemon -e .graphql,js ./main.js"
+    "nodemon": "./node_modules/.bin/nodemon -e .graphqls,js ./main.js"
   },
   "dependencies": {
     "graphql": "^0.9.1",

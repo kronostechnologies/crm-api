@@ -33,6 +33,43 @@ enum ActivityType {
 	TASK
 }
 
+enum SortOrder {
+	ASC,
+	DESC
+}
+
+enum PlanAccountCategory {
+	MUTUAL_FUND,
+	SEGREGATED_FUND,
+	GIC,
+	SHARE,
+	OTHER
+}
+
+enum Currency {
+	CAD,
+	USD,
+	EUR,
+	GBP
+}
+
+enum PaymentMode {
+	ANNUAL,
+	BIMNTHL,
+	WKLY,
+	MNTHLY,
+	SINGLEPA,
+	BIWKLY,
+	DAILY,
+	BIANNUAL,
+	QUARTLY
+}
+
+enum InsuranceCoverageType {
+	COVERAGE,
+	RIDER
+}
+
 
 # Interfaces
 interface BaseContact {
@@ -60,10 +97,6 @@ interface BaseContact {
 
 	# Picture URL location of the contact.
 	picture: String
-
-	# API DEV : IA Only. Leave blank for others
-	# Contact rank
-	rank: String
 }
 
 interface BaseActivity {
@@ -249,7 +282,7 @@ type DetailedContact implements BaseContact {
 	id: ID,
 
 	# Display name of the contact.
-	displayName: String
+	displayName: String,
 
 	# First name of the contact.
 	firstName: String,
@@ -258,7 +291,11 @@ type DetailedContact implements BaseContact {
 	middleName: String,
 
 	# Last name of the contact.
-	lastName: String
+	lastName: String,
+
+	# API DEV : IA Only. Leave blank for others
+	# Contact rank
+	rank: String,
 
 	# Idividual/Organization indicator
 	contactType: ContactType,
@@ -296,7 +333,7 @@ type DetailedContact implements BaseContact {
 
 	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
 	# Contact origins
-	refferedBy: [FieldValue],
+	referredBy: [FieldValue],
 
 	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
 	# Contact hobbies
@@ -347,7 +384,7 @@ type DetailedContact implements BaseContact {
 	activities(pagination: PaginationParameters, filters: ActivityListFilters!, userContext: UserContext): ActivityList!,
 
 	# Investments, or plans of the contact. (finance only)
-	plans: [AccountPlan!]!,
+	plans: [Plan!]!,
 
 	# Insurance policies of the contact. (finance only)
 	policies: [InsurancePolicy!]!,
@@ -356,7 +393,7 @@ type DetailedContact implements BaseContact {
 	creationDate: Date,
 
 	# Date the record was modified
-	lastUpdateDate: Date,
+	lastUpdateDate: Date
 }
 
 # Representation of a list of contacts.
@@ -391,10 +428,10 @@ type ListActivity implements BaseActivity {
 	startDate: DateTime,
 
 	# Date & time when the activity ends.
-	endDate: DateTime
+	endDate: DateTime,
 
 	# Translated location name of the activity.
-	location: String,
+	location: String
 }
 
 # Complete representation of an activity.
@@ -430,16 +467,16 @@ type DetailedActivity implements BaseActivity {
 	location: String,
 
 	# Category
-	category: String,
+	category: FieldValue,
 
 	# Sub-Category
-	subCategory: String,
+	subCategory: FieldValue,
 
 	# Activity priority 1 to 5
 	priority: Int,
 
 	# Alarm delay in minute (1440 minutes for 1 day, 60 minutes for 1 hour)
-	alarmDelay: int,
+	alarmDelay: Int,
 
 	# the recurence rule for this event. The recurence is a string conform to RFC 5545 (see RRULE http://tools.ietf.org/html/rfc5545#section-3.8.5.3).
 	recurrenceRule: String,
@@ -485,10 +522,19 @@ type ExceptionActivity {
 }
 
 # Defines an account plan entity. Cannot be modified.
-type AccountPlan {
+type Plan {
+
+	id: ID
 
 	# Plan description including type
 	description: String,
+
+	# DEV: vd_account_type_valid
+	# Plan's account type, which is the main category.
+	accountType: FieldValue,
+
+	# Plan owner name
+	ownerName: String
 
 	# Last updated date of the plan.
 	marketValueUpdateDate: Date,
@@ -496,34 +542,98 @@ type AccountPlan {
 	# Current market value for the plan.
 	marketValue: Float,
 
-	# DEV: vd_account_type_valid
-	# Plan's account type, which is the main category.
-	accountType: FieldValue,
-
-	# Account category. This value is translated.
-	accountCategory: FieldValue
+	# Plan accounts
+	accounts: [PlanAccount!]!
 }
+
+type PlanAccount {
+
+	id: ID
+
+	# Account category
+	category: PlanAccountCategory,
+
+	# Manufacturer name
+	manufacturerName: String,
+
+	# Account name or number
+	accountName: String,
+
+	# Product name
+	productName: String,
+
+	# Current market value for the plan.
+	marketValue: Float,
+
+	# Last updated date of the plan.
+	marketValueUpdateDate: Date,
+
+	# Currency
+	currency: Currency,
+
+	# Load type
+	loadType: String,
+
+	# Fund Unit quantity
+	units: Float
+
+	# Fund unit price
+	unitPrice: Float
+
+	# GIC Term date
+	termDate: Date,
+
+	# GIC Certificate Nb
+	certificateNb: String,
+
+	# GIC Maturity Amount
+	maturityAmount: Float,
+
+	# GIC Maturity Date
+	maturityDate: Date,
+
+	# GIC Interest rate
+	interestRate: Float,
+
+	# GIC InitialAmount
+	initialAmount: Float
+}
+
 
 # Defines an insurance policy entity. Cannot be modified.
 type InsurancePolicy {
+
+	id: ID,
+
 	# Policy's line of business.
 	lineOfBusiness: FieldValue,
 
 	# Policy insurer name.
-	carrier: String,
+	ownerName: String,
 
-	# Policy product name.
-	product: String,
+	# Policy insurer name.
+	carrierName: String,
 
 	# Policy number.
 	policyNb: String,
 
-	# Policy annual premium.
-	annualPremium: Float,
+	# Policy product name.
+	productName: String,
 
-	# Todo: à discuter
-	# Policy benefits amount.
-	benefits: Float,
+	# Policy annual premium.
+	paymentAmount: Float,
+
+	# Payment mode (frequency)
+	paymentMode: PaymentMode,
+
+	# Policy annual premium.
+	annualPaymentAmount: Float,
+
+	# Effective/Issue date
+	effDate: Date,
+
+	# Term/End date
+	termDate: Date
 
 	# True if the contact is the owner of this insurance policy.
 	isOwner: Boolean!,
@@ -532,7 +642,52 @@ type InsurancePolicy {
 	isBeneficiary: Boolean!,
 
 	# True if the contact is insured by this insurance policy.
-	isInsured: Boolean!
+	isInsured: Boolean!,
+
+	coverages: [InsuranceCoverage!]!
+
+}
+
+type InsuranceCoverage {
+
+	id: ID,
+
+	# Coverage type
+	type: InsuranceCoverageType
+
+	# Coverage number
+	coverageNumber: String
+
+	# Policy product name.
+	productName: String,
+
+	# DEV: vd_cov_product_type
+	# Coverage product type
+	productType: FieldValue
+
+	# DEV vd_lives_type
+	# Lives types
+	livesType: FieldValue,
+
+	# Modal premium
+	modalPremiumAmount: Float,
+
+	# current/total amount of coverage benefit
+	amount: Float,
+
+	# Effective/Issue date
+	effDate: Date,
+
+	# True if the contact is insured by this insurance coverage.
+	isInsured: Boolean!,
+
+	insureds: [InsuranceInsured!]!
+}
+
+type InsuranceInsured {
+	name: String,
+	insuranceClass: String
+	smoker: Boolean
 }
 
 # Representation of an activity list.
@@ -551,7 +706,7 @@ input PaginationParameters {
 	# Page requested in a list.
 	page: Int,
 
-	# ToDo: Limit perPage values?
+	# DEV : Hard limit à 500
 	# Elements per page requested in a list. Supports 10, 25, 50, 100, rounded to the closest.
 	perPage: Int
 }
@@ -564,10 +719,19 @@ input UserContext {
 
 input ActivityListFilters {
 	# The activities need to be contained in the specified activity types in order to be displayed. This filter is mandatory.
-	agendaTypeIn: [ActivityType!]!
+	agendaTypeIn: [ActivityType!]!,
 
 	# If specified, filter activity based on completed flag.
-	isCompleted: Boolean
+	isCompleted: Boolean,
+
+	# Minimum startDate
+	minStartDate: DateTime,
+
+	# Maximum startDate
+	maxStartDate: DateTime,
+
+	# Sort order by sortDate
+	sortOrder: SortOrder
 }
 
 # Filters input of the contacts list.
