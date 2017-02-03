@@ -84,10 +84,10 @@ interface BaseActivity {
 	allDay: Boolean!,
 
 	# Date & time when the activity starts.
-	dateStart: DateTime,
+	startDate: DateTime,
 
 	# Date & time when the activity ends.
-	dateEnd: DateTime
+	endDate: DateTime
 }
 
 type FieldValue {
@@ -264,14 +264,14 @@ type DetailedContact implements BaseContact {
 	contactType: ContactType,
 
 	# Decease date of the contact.
-	dateDecease: Date,
+	deceaseDate: Date,
 
 	# API DEV: If smoker is null, assume false
 	# True if the contact is a smoker. (finance only)
 	smoker: Boolean!,
 
 	# Date when the contact was no longer considered a smoker. (finance only)
-	smokerDateEnd: Date,
+	smokerEndDate: Date,
 
 	# API DEV: In marital_status table, must do a TOP 1 query to fetch it, and it can be NULL
 	# API DEV: civilStatus is in vdvalues (vd_marital_status)
@@ -330,7 +330,13 @@ type DetailedContact implements BaseContact {
 	plans: [AccountPlan!]!,
 
 	# Insurance policies of the contact. (finance only)
-	policies: [InsurancePolicy!]!
+	policies: [InsurancePolicy!]!,
+
+	# Date the record was modified
+	creationDate: Date,
+
+	# Date the record was modified
+	lastUpdateDate: Date,
 }
 
 # Representation of a list of contacts.
@@ -362,10 +368,10 @@ type ListActivity implements BaseActivity {
 	allDay: Boolean!,
 
 	# Date & time when the activity starts.
-	dateStart: DateTime,
+	startDate: DateTime,
 
 	# Date & time when the activity ends.
-	dateEnd: DateTime
+	endDate: DateTime
 
 	# Translated location name of the activity.
 	location: String,
@@ -392,13 +398,13 @@ type DetailedActivity implements BaseActivity {
 	allDay: Boolean!,
 
 	# Date & time when the activity starts.
-	dateStart: DateTime,
+	startDate: DateTime,
 
 	# Date & time when the activity ends.
-	dateEnd: DateTime,
+	endDate: DateTime,
 
 	# Date & Time the activity was initially scheduled
-	dateInitial: DateTime,
+	initialDate: DateTime,
 
 	# Activity location
 	location: String,
@@ -416,10 +422,10 @@ type DetailedActivity implements BaseActivity {
 	alarmDelay: int,
 
 	# the recurence rule for this event. The recurence is a string conform to RFC 5545 (see RRULE http://tools.ietf.org/html/rfc5545#section-3.8.5.3).
-	rrule: String,
+	recurrenceRule: String,
 
 	# the exception rule for this event. The exception is a string conform to RFC 5545 (see EXDATE http://tools.ietf.org/html/rfc5545#section-3.8.5.1).
-	exdate: String,
+	exceptionRule: String,
 
 	# The details of the exception that are describe in the RFC5545 ExDate ($exception) string.
 	# These object will never have their exception and exception_detail filled: An exception cannot have a recurrence.
@@ -432,6 +438,12 @@ type DetailedActivity implements BaseActivity {
 
 	# Contact information. Cannot be modified through a mutation of an Activity.
 	contact: ListContact!
+
+	# Date the record was modified
+	creationDate: Date,
+
+	# Date the record was modified
+	lastUpdateDate: Date,
 }
 
 type ExceptionActivity {
@@ -443,7 +455,7 @@ type ExceptionActivity {
 	subject: String!,
 
 	# Date & time when the activity starts.
-	dateStart: DateTime!,
+	startDate: DateTime!,
 
 	# Date & time when the activity ends.
 	exceptionDate: DateTime!,
@@ -459,7 +471,7 @@ type AccountPlan {
 	description: String,
 
 	# Last updated date of the plan.
-	marketValueUpdatedAt: Date,
+	marketValueUpdateDate: Date,
 
 	# Current market value for the plan.
 	marketValue: Float,
