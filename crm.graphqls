@@ -6,6 +6,9 @@ scalar Date
 # Date with time, Format: YYYY-mm-dd hh:ii:ss (2017-12-30 23:58:59)
 scalar DateTime
 
+# Edge cursor, base64
+scalar Cursor
+
 
 # Enumerations
 enum Gender {
@@ -70,63 +73,37 @@ enum InsuranceCoverageType {
 	RIDER
 }
 
+enum LabelGroup {
+	CLASS,
+	ADDRESS_TYPE,
+	PHONE_TYPE,
+	CIVIL_STATUS,
+	CONTACT_CATEGORIES,
+	CONTACT_DISTRIBUTION_LISTS,
+	CONTACT_REFERRED_BY,
+	CONTACT_HOBBIES,
+	CONTACT_INDUSTRIES,
+	CONTACT_TERRITORY
+}
 
 # Interfaces
-interface BaseContact {
-	# Unique numerical identifier of the contact.
-	id: ID,
-
-	# API DEV : This is not the screen_name. Use "FirstName LastName" for Individual AND "screen_name" for Organization
-	# Display name of the contact.
-	displayName: String
-
-	# First name of the contact.
-	firstName: String,
-
-	# Middle name of the contact.
-	middleName: String,
-
-	# Last name of the contact.
-	lastName: String,
-
-	# Idividual/Organization indicator
-	contactType: ContactType,
-
-	# Contact categories
-	categories: [FieldValue],
-
-	# Picture URL location of the contact.
-	picture: String
+interface Node {
+	id: ID!
 }
 
-interface BaseActivity {
-	# Unique numerical identifier of the activity.
-	id: ID,
 
-	# API DEV: Assume false if null
-	# True if the activity is assumed to be completed.
-	isCompleted: Boolean!,
-
-	# Type of the activity.
-	type: ActivityType!,
-
-	# Subject of the activity.
-	subject: String!,
-
-	# True if the activity lasts all day.
-	allDay: Boolean!,
-
-	# Date & time when the activity starts.
-	startDate: DateTime,
-
-	# Date & time when the activity ends.
-	endDate: DateTime
+# Types
+type PageInfo {
+	hasNextPage: Boolean!
+	hasPreviousPage: Boolean!
+	startCursor: String
+	endCursor: String
 }
 
-type FieldValue {
 
+type FieldValue implements Node {
 	# Unique numerical identifier of the Field Value.
-	id: ID,
+	id: ID!,
 
 	# French value
 	fr: String!,
@@ -137,30 +114,12 @@ type FieldValue {
 	# DEV: system_name lorsque pertinant
 	# System Code
 	code: String
-
-}
-
-
-# Types
-# List pagination actually used by the server.
-type PaginationAnswer {
-	# Current page. Default is 1.
-	page: Int,
-
-	# Results per page. Can only be 10, 25, 50 or 100.
-	perPage: Int,
-
-	# Maximum pages that can be displayed, and also the last page.
-	maxPages: Int,
-
-	# Total number of items the server can return.
-	totalItems: Int
 }
 
 # Representation of a job entity
-type Job {
+type Job implements Node {
 	# Unique identifier of the job.
-	id: ID,
+	id: ID!,
 
 	# Name of the job.
 	occupation: String,
@@ -170,9 +129,9 @@ type Job {
 }
 
 # Representation of an address entity
-type Address {
+type Address implements Node {
 	# Unique identifier of the address.
-	id: ID,
+	id: ID!,
 
 	# API DEV: i_contact_address contains main and postal fields
 	# API DEV: If main is null, assume it is not the main address
@@ -204,9 +163,9 @@ type Address {
 }
 
 # Representation of a phone entity
-type Phone {
+type Phone implements Node {
 	# Unique identifier of the phone.
-	id: ID,
+	id: ID!,
 
 	# API DEV: If main is null, assume it is not the main address
 	# True if the phone number is considered to be a main one.
@@ -228,9 +187,9 @@ type Phone {
 }
 
 # Representation of an email entity
-type Email {
+type Email implements Node {
 	# Unique identifier of the email.
-	id: ID,
+	id: ID!,
 
 	# API DEV: If main is null, assume it is not the main address
 	# True if the email address is considered to be the main one.
@@ -247,39 +206,10 @@ type Email {
 	notes: String
 }
 
-# Representation of a contact in a list.
-type ListContact implements BaseContact {
-	# Unique numerical identifier of the contact.
-	id: ID,
-
-	# Display name of the contact.
-	displayName: String
-
-	# First name of the contact.
-	firstName: String,
-
-	# Middle name of the contact.
-	middleName: String,
-
-	# Last name of the contact.
-	lastName: String,
-
-	# Idividual/Organization indicator
-	contactType: ContactType,
-
-	# API DEV: Fetch with i_contact_class, it uses vdvalues too
-	# Contact categories
-	categories: [FieldValue],
-
-	# API DEV: Through fk_document_picture, it should be possible to fetch a public URL
-	# Picture URL of the contact.
-	picture: String
-}
-
 # Represents a contact entity
-type DetailedContact implements BaseContact {
+type Contact implements Node {
 	# Unique numerical identifier of the contact.
-	id: ID,
+	id: ID!,
 
 	# Display name of the contact.
 	displayName: String,
@@ -381,7 +311,7 @@ type DetailedContact implements BaseContact {
 	emails: [Email],
 
 	# Activities of the contact. Can be sorted.
-	activities(pagination: PaginationParameters, filters: ActivityListFilters!, userContext: UserContext): ActivityList!,
+	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
 
 	# Investments, or plans of the contact. (finance only)
 	plans: [Plan!]!,
@@ -396,48 +326,20 @@ type DetailedContact implements BaseContact {
 	lastUpdateDate: Date
 }
 
-# Representation of a list of contacts.
-type ContactList {
-	# List of contacts returned.
-	items: [ListContact!]!,
-
-	# Pagination currently being used by the server.
-	pagination: PaginationAnswer
+type ContactEdge {
+	node: Contact,
+	cursor: Cursor
 }
 
-type ListActivity implements BaseActivity {
-	# Unique identifier of the activity.
-	id: ID,
-
-	# API DEV: Assume false if null
-	# API DEV: Calculated field on state (TODO = false, DONE = true)
-	# True if the activity is considered completed.
-	isCompleted: Boolean!,
-
-	# Type of the activity.
-	type: ActivityType!,
-
-	# Subject of the activity.
-	subject: String!,
-
-	# API DEV: Calculated field, ((!$row['time_start'] || $row['time_start'] == '00:00:00') && (!$row['time_end'] || $row['time_end'] == '00:00:00' || $row['time_end'] == '23:59:59') ? 'true' : 'false');
-	# True if the activity lasts all day.
-	allDay: Boolean!,
-
-	# Date & time when the activity starts.
-	startDate: DateTime,
-
-	# Date & time when the activity ends.
-	endDate: DateTime,
-
-	# Translated location name of the activity.
-	location: String
+type ContactConnection {
+	edges: [ContactEdge],
+	pageInfo: PageInfo
 }
 
 # Complete representation of an activity.
-type DetailedActivity implements BaseActivity {
+type Activity implements Node {
 	# Unique identifier of the activity.
-	id: ID,
+	id: ID!,
 
 	# API DEV: Assume false if null
 	# API DEV: Calculated field on state (TODO = false, DONE = true)
@@ -494,13 +396,23 @@ type DetailedActivity implements BaseActivity {
 	description: String,
 
 	# Contact information. Cannot be modified through a mutation of an Activity.
-	contact: ListContact!
+	contact: Contact!
 
 	# Date the record was modified
 	creationDate: Date,
 
 	# Date the record was modified
 	lastUpdateDate: Date,
+}
+
+type ActivityEdge {
+	node: Activity,
+	cursor: Cursor
+}
+
+type ActivityConnection {
+	edges: [ActivityEdge]
+	cursor: Cursor
 }
 
 type ExceptionActivity {
@@ -522,9 +434,9 @@ type ExceptionActivity {
 }
 
 # Defines an account plan entity. Cannot be modified.
-type Plan {
+type Plan implements Node {
 
-	id: ID
+	id: ID!
 
 	# Plan description including type
 	description: String,
@@ -546,9 +458,9 @@ type Plan {
 	accounts: [PlanAccount!]!
 }
 
-type PlanAccount {
+type PlanAccount implements Node {
 
-	id: ID
+	id: ID!
 
 	# Account category
 	category: PlanAccountCategory,
@@ -601,9 +513,8 @@ type PlanAccount {
 
 
 # Defines an insurance policy entity. Cannot be modified.
-type InsurancePolicy {
-
-	id: ID,
+type InsurancePolicy implements Node {
+	id: ID!,
 
 	# Policy's line of business.
 	lineOfBusiness: FieldValue,
@@ -648,9 +559,8 @@ type InsurancePolicy {
 
 }
 
-type InsuranceCoverage {
-
-	id: ID,
+type InsuranceCoverage implements Node {
+	id: ID!,
 
 	# Coverage type
 	type: InsuranceCoverageType
@@ -693,30 +603,17 @@ type InsuranceInsured {
 # Representation of an activity list.
 type ActivityList {
 	# List of activities.
-	items: [ListActivity!]!,
-
-	# Pagination currently being used by the server.
-	pagination: PaginationAnswer
+	items: [Activity!]
 }
 
+type PageInfo {
+	hasPreviousPage: Boolean,
+	previousPage: String,
+	hasNextPage: Boolean,
+	nextPage: String
+}
 
 # Inputs
-# List pagination parameters requested by the client.
-input PaginationParameters {
-	# Page requested in a list.
-	page: Int,
-
-	# DEV : Hard limit à 500
-	# Elements per page requested in a list. Supports 10, 25, 50, 100, rounded to the closest.
-	perPage: Int
-}
-
-input UserContext {
-	# API DEV: Use that for translating vdvalues.
-	# Application language of the end user. Either en or fr.
-	locale: Language
-}
-
 input ActivityListFilters {
 	# The activities need to be contained in the specified activity types in order to be displayed. This filter is mandatory.
 	agendaTypeIn: [ActivityType!]!,
@@ -743,23 +640,14 @@ input ContactListFilters {
 	nameStartsWith: String
 }
 
-
 # Main types
 type Query {
-	# Requests a single, detailed contact.
-	contact(id: ID!, userContext: UserContext): DetailedContact,
+	# Requests a single node
+	node(id: ID!): Node
 
 	# Requests multiple, non-detailed contacts.
-	contacts(pagination: PaginationParameters, filters: ContactListFilters, userContext: UserContext): ContactList!,
+	contacts(first: Int, after: Cursor, from: Cursor, filters: ContactListFilters): ContactConnection!,
 
-	# Requests a single, detailed activity.
-	activity(id: ID!, userContext: UserContext): DetailedActivity
-}
-
-type Mutation {
-	# Writes a contact's information. Not setting the contact ID will treat it as a new contact.
-	contact: DetailedContact,
-
-	# Writes an agenda's information. Not setting the agenda ID will treat it as a new agenda.
-	activity: DetailedActivity
+	# Labels for specific group
+	labels(group: LabelGroup): [FieldValue!]
 }
