@@ -6,7 +6,7 @@ scalar Date
 # Date with time, Format: YYYY-mm-dd hh:ii:ss (2017-12-30 23:58:59)
 scalar DateTime
 
-# Edge cursor, base64
+# Opaque cursor for page navigation on edge (base64 string)
 scalar Cursor
 
 
@@ -73,16 +73,16 @@ enum InsuranceCoverageType {
 	RIDER
 }
 
-enum LabelGroup {
+enum FieldValueType {
 	CLASS,
 	ADDRESS_TYPE,
 	PHONE_TYPE,
 	CIVIL_STATUS,
-	CONTACT_CATEGORIES,
+	CONTACT_CATEGORY,
 	CONTACT_DISTRIBUTION_LISTS,
 	CONTACT_REFERRED_BY,
-	CONTACT_HOBBIES,
-	CONTACT_INDUSTRIES,
+	CONTACT_HOBBY,
+	CONTACT_INDUSTRY,
 	CONTACT_TERRITORY
 }
 
@@ -96,10 +96,9 @@ interface Node {
 type PageInfo {
 	hasNextPage: Boolean!
 	hasPreviousPage: Boolean!
-	startCursor: String
-	endCursor: String
+	startCursor: Cursor
+	endCursor: Cursor
 }
-
 
 type FieldValue implements Node {
 	# Unique numerical identifier of the Field Value.
@@ -111,9 +110,29 @@ type FieldValue implements Node {
 	# English value
 	en: String!,
 
-	# DEV: system_name lorsque pertinant
+	# DEV: Équivalent du system_name mais hard-coded pour API
 	# System Code
 	code: String
+}
+
+# Representation of a user entity
+type User implements Node {
+	# Unique identifier of the user.
+	id: ID!,
+
+	# Name of the user.
+	displayName: String,
+
+	# Name of the user.
+	firstName: String,
+
+	# Name of the user.
+	lastName: String,
+
+	# Connection email of the user
+	email: String
+
+	# TODO: todo/done Calendar ?
 }
 
 # Representation of a job entity
@@ -336,6 +355,7 @@ type ContactConnection {
 	pageInfo: PageInfo
 }
 
+
 # Complete representation of an activity.
 type Activity implements Node {
 	# Unique identifier of the activity.
@@ -431,6 +451,16 @@ type ExceptionActivity {
 
 	# The recurrent activity is deleted for this date
 	deleted: Boolean!
+}
+
+type Calendar implements Node {
+
+	# Unique identifier of the calendar.
+	id: ID!
+
+	# Activities of the calendar
+	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
+
 }
 
 # Defines an account plan entity. Cannot be modified.
@@ -600,12 +630,6 @@ type InsuranceInsured {
 	smoker: Boolean
 }
 
-# Representation of an activity list.
-type ActivityList {
-	# List of activities.
-	items: [Activity!]
-}
-
 type PageInfo {
 	hasPreviousPage: Boolean,
 	previousPage: String,
@@ -616,28 +640,32 @@ type PageInfo {
 # Inputs
 input ActivityListFilters {
 	# The activities need to be contained in the specified activity types in order to be displayed. This filter is mandatory.
-	agendaTypeIn: [ActivityType!]!,
+	agendaTypeIn: [ActivityType!]!
 
 	# If specified, filter activity based on completed flag.
-	isCompleted: Boolean,
+	isCompleted: Boolean
 
 	# Minimum startDate
-	minStartDate: DateTime,
+	minStartDate: DateTime
 
 	# Maximum startDate
-	maxStartDate: DateTime,
+	maxStartDate: DateTime
 
 	# Sort order by sortDate
 	sortOrder: SortOrder
+
 }
 
 # Filters input of the contacts list.
 input ContactListFilters {
 	# If the combined values of firstName, middleName, and lastName contains the requested string, the filter will pass. Not setting the filter will ignore it.
-	nameContains: String,
+	nameContains: String
 
 	# If the combined values of firstName, middleName, and lastName starts with the requested string, the filter will pass. Not setting the filter will ignore it.
 	nameStartsWith: String
+
+	# user id
+	ownedBy: ID
 }
 
 # Main types
@@ -645,9 +673,12 @@ type Query {
 	# Requests a single node
 	node(id: ID!): Node
 
+	# Current connected user
+	me: User
+
 	# Requests multiple, non-detailed contacts.
-	contacts(first: Int, after: Cursor, from: Cursor, filters: ContactListFilters): ContactConnection!,
+	contacts(first: Int, after: Cursor, from: Cursor, filters: ContactListFilters): ContactConnection!
 
 	# Labels for specific group
-	labels(group: LabelGroup): [FieldValue!]
+	fieldValues(type: FieldValueType): [FieldValue!]
 }
