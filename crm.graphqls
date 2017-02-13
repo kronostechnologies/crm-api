@@ -1,0 +1,684 @@
+# Scalar types
+
+# Date with no time, Format: YYYY-mm-dd  (2017-12-30)
+scalar Date
+
+# Date with time, Format: YYYY-mm-dd hh:ii:ss (2017-12-30 23:58:59)
+scalar DateTime
+
+# Opaque cursor for page navigation on edge (base64 string)
+scalar Cursor
+
+
+# Enumerations
+enum Gender {
+	MALE,
+	FEMALE
+}
+
+enum Language {
+	FRENCH,
+	ENGLISH
+}
+
+enum ContactType {
+	INDIVIDUAL,
+	ORGANIZATION
+}
+
+enum ActivityType {
+	CALL,
+	LETTER,
+	MEETING,
+	VACATION,
+	FILE,
+	NOTE,
+	TASK
+}
+
+enum SortOrder {
+	ASC,
+	DESC
+}
+
+enum PlanAccountCategory {
+	MUTUAL_FUND,
+	SEGREGATED_FUND,
+	GIC,
+	SHARE,
+	OTHER
+}
+
+enum Currency {
+	CAD,
+	USD,
+	EUR,
+	GBP
+}
+
+enum PaymentMode {
+	ANNUAL,
+	BIMNTHL,
+	WKLY,
+	MNTHLY,
+	SINGLEPA,
+	BIWKLY,
+	DAILY,
+	BIANNUAL,
+	QUARTLY
+}
+
+enum InsuranceCoverageType {
+	COVERAGE,
+	RIDER
+}
+
+enum FieldValueType {
+	CLASS,
+	ADDRESS_TYPE,
+	PHONE_TYPE,
+	CIVIL_STATUS,
+	CONTACT_CATEGORY,
+	CONTACT_DISTRIBUTION_LISTS,
+	CONTACT_REFERRED_BY,
+	CONTACT_HOBBY,
+	CONTACT_INDUSTRY,
+	CONTACT_TERRITORY
+}
+
+# Interfaces
+interface Node {
+	id: ID!
+}
+
+
+# Types
+type PageInfo {
+	hasNextPage: Boolean!
+	hasPreviousPage: Boolean!
+	startCursor: Cursor
+	endCursor: Cursor
+}
+
+type FieldValue implements Node {
+	# Unique numerical identifier of the Field Value.
+	id: ID!,
+
+	# French value
+	fr: String!,
+
+	# English value
+	en: String!,
+
+	# DEV: Équivalent du system_name mais hard-coded pour API
+	# System Code
+	code: String
+}
+
+# Representation of a user entity
+type User implements Node {
+	# Unique identifier of the user.
+	id: ID!,
+
+	# Name of the user.
+	displayName: String,
+
+	# Name of the user.
+	firstName: String,
+
+	# Name of the user.
+	lastName: String,
+
+	# Connection email of the user
+	email: String
+
+	# TODO: todo/done Calendar ?
+}
+
+# Representation of a job entity
+type Job implements Node {
+	# Unique identifier of the job.
+	id: ID!,
+
+	# Name of the job.
+	occupation: String,
+
+	# Employer name of the job.
+	employer: String
+}
+
+# Representation of an address entity
+type Address implements Node {
+	# Unique identifier of the address.
+	id: ID!,
+
+	# API DEV: i_contact_address contains main and postal fields
+	# API DEV: If main is null, assume it is not the main address
+	# True if this is considered as a main address.
+	main: Boolean!,
+
+	# API DEV: If postal is null, assume it is not a postal address
+	# True if this is considered as a postal address.
+	postal: Boolean!,
+
+	# API DEV: Is a vdvalue
+	# Translated type of the address.
+	type: FieldValue!,
+
+	# First line of the address.
+	line1: String!,
+
+	# Second line of the address.
+	line2: String,
+
+	# State or province of the address.
+	stateProvince: String,
+
+	# Country of the address.
+	country: String,
+
+	# Postal/zip code of the address.
+	postalCode: String,
+}
+
+# Representation of a phone entity
+type Phone implements Node {
+	# Unique identifier of the phone.
+	id: ID!,
+
+	# API DEV: If main is null, assume it is not the main address
+	# True if the phone number is considered to be a main one.
+	main: Boolean!,
+
+	# API DEV: vdvalue with vd_type_phone
+	# Type of the phone.
+	type: FieldValue!,
+
+	# Actual phone number. The extension is included in it.
+	number: String!,
+
+	# API DEV: If longDistance is null, assume it is not the main address
+	# True if the number is considered long distance.
+	longDistance: Boolean,
+
+	# Notes of the phone number.
+	notes: String
+}
+
+# Representation of an email entity
+type Email implements Node {
+	# Unique identifier of the email.
+	id: ID!,
+
+	# API DEV: If main is null, assume it is not the main address
+	# True if the email address is considered to be the main one.
+	main: Boolean!,
+
+	# API DEV: vd_type_email
+	# Type of the email address.
+	type: FieldValue!,
+
+	# Actual email address.
+	email: String!,
+
+	# Notes of the email address.
+	notes: String
+}
+
+# Represents a contact entity
+type Contact implements Node {
+	# Unique numerical identifier of the contact.
+	id: ID!,
+
+	# Display name of the contact.
+	displayName: String,
+
+	# First name of the contact.
+	firstName: String,
+
+	# Middle name of the contact.
+	middleName: String,
+
+	# Last name of the contact.
+	lastName: String,
+
+	# API DEV : IA Only. Leave blank for others
+	# Contact rank
+	rank: String,
+
+	# Idividual/Organization indicator
+	contactType: ContactType,
+
+	# Decease date of the contact.
+	deceaseDate: Date,
+
+	# API DEV: If smoker is null, assume false
+	# True if the contact is a smoker. (finance only)
+	smoker: Boolean!,
+
+	# Date when the contact was no longer considered a smoker. (finance only)
+	smokerEndDate: Date,
+
+	# API DEV: In marital_status table, must do a TOP 1 query to fetch it, and it can be NULL
+	# API DEV: civilStatus is in vdvalues (vd_marital_status)
+	# Translated civil status of the contact.
+	civilStatus: FieldValue,
+
+	# API DEV: civilStatusSince is date_start of marital_status
+	# Date since the current civil status is active.
+	civilStatusSince: Date,
+
+	# API DEV: 1-1 relationship with job table from contacts
+	# Contact's job.
+	job: Job,
+
+	# API DEV: Fetch with i_contact_class, it uses vdvalues too
+	# Contact categories
+	categories: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+	# Contact distribution lists
+	distributionLists: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+	# Contact origins
+	referredBy: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+	# Contact hobbies
+	hobbies: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+	# Contact i_contact_activity_domain
+	industries: [FieldValue],
+
+	# API DEV: Fetch with vdvalues (vd_territory)
+	# Translated territory name of the contact. (finance only)
+	territory: FieldValue,
+
+	# API DEV: Segments must be fetched with vd_seg# and vdvalues
+	# Segments 1-6. Translated values. (finance only)
+	seg1: FieldValue,
+	seg2: FieldValue,
+	seg3: FieldValue,
+	seg4: FieldValue,
+	seg5: FieldValue,
+	seg6: FieldValue,
+
+	# API DEV: Through fk_document_picture, it should be possible to fetch a public URL
+	# Picture URL of the contact.
+	picture: String,
+
+	# API DEV: Parse vdvalue to return a Gender enum value
+	# Gender of the contact.
+	gender: Gender,
+
+	# Birth date of the contact.
+	birthDate: Date,
+
+	# DEV: identification_customer_no
+	# Client #
+	clientNb: String,
+
+	# Addresses of the contact.
+	adresses: [Address],
+
+	# Phone numbers of the contact.
+	phones: [Phone],
+
+	# Emails of the contact.
+	emails: [Email],
+
+	# Activities of the contact. Can be sorted.
+	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
+
+	# Investments, or plans of the contact. (finance only)
+	plans: [Plan!]!,
+
+	# Insurance policies of the contact. (finance only)
+	policies: [InsurancePolicy!]!,
+
+	# Date the record was modified
+	creationDate: Date,
+
+	# Date the record was modified
+	lastUpdateDate: Date
+}
+
+type ContactEdge {
+	node: Contact,
+	cursor: Cursor
+}
+
+type ContactConnection {
+	edges: [ContactEdge],
+	pageInfo: PageInfo
+}
+
+
+# Complete representation of an activity.
+type Activity implements Node {
+	# Unique identifier of the activity.
+	id: ID!,
+
+	# API DEV: Assume false if null
+	# API DEV: Calculated field on state (TODO = false, DONE = true)
+	# True if the activity is considered completed.
+	isCompleted: Boolean!,
+
+	# Type of the activity.
+	type: ActivityType!,
+
+	# Subject of the activity.
+	subject: String!,
+
+	# API DEV: Calculated field, ((!$row['time_start'] || $row['time_start'] == '00:00:00') && (!$row['time_end'] || $row['time_end'] == '00:00:00' || $row['time_end'] == '23:59:59') ? 'true' : 'false');
+	# True if the activity lasts all day.
+	allDay: Boolean!,
+
+	# Date & time when the activity starts.
+	startDate: DateTime,
+
+	# Date & time when the activity ends.
+	endDate: DateTime,
+
+	# Date & Time the activity was initially scheduled
+	initialDate: DateTime,
+
+	# Activity location
+	location: String,
+
+	# Category
+	category: FieldValue,
+
+	# Sub-Category
+	subCategory: FieldValue,
+
+	# Activity priority 1 to 5
+	priority: Int,
+
+	# Alarm delay in minute (1440 minutes for 1 day, 60 minutes for 1 hour)
+	alarmDelay: Int,
+
+	# the recurence rule for this event. The recurence is a string conform to RFC 5545 (see RRULE http://tools.ietf.org/html/rfc5545#section-3.8.5.3).
+	recurrenceRule: String,
+
+	# the exception rule for this event. The exception is a string conform to RFC 5545 (see EXDATE http://tools.ietf.org/html/rfc5545#section-3.8.5.1).
+	exceptionRule: String,
+
+	# The details of the exception that are describe in the RFC5545 ExDate ($exception) string.
+	# These object will never have their exception and exception_detail filled: An exception cannot have a recurrence.
+	# Thus exceptions cannot have exceptions.
+	exceptions: [ExceptionActivity],
+
+	# API DEV: Contained in action_notes table
+	# Description of the activity.
+	description: String,
+
+	# Contact information. Cannot be modified through a mutation of an Activity.
+	contact: Contact!
+
+	# Date the record was modified
+	creationDate: Date,
+
+	# Date the record was modified
+	lastUpdateDate: Date,
+}
+
+type ActivityEdge {
+	node: Activity,
+	cursor: Cursor
+}
+
+type ActivityConnection {
+	edges: [ActivityEdge]
+	cursor: Cursor
+}
+
+type ExceptionActivity {
+
+	# Type of the activity.
+	type: ActivityType!,
+
+	# Subject of the activity.
+	subject: String!,
+
+	# Date & time when the activity starts.
+	startDate: DateTime!,
+
+	# Date & time when the activity ends.
+	exceptionDate: DateTime!,
+
+	# The recurrent activity is deleted for this date
+	deleted: Boolean!
+}
+
+type Calendar implements Node {
+
+	# Unique identifier of the calendar.
+	id: ID!
+
+	# Activities of the calendar
+	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
+
+}
+
+# Defines an account plan entity. Cannot be modified.
+type Plan implements Node {
+
+	id: ID!
+
+	# Plan description including type
+	description: String,
+
+	# DEV: vd_account_type_valid
+	# Plan's account type, which is the main category.
+	accountType: FieldValue,
+
+	# Plan owner name
+	ownerName: String
+
+	# Last updated date of the plan.
+	marketValueUpdateDate: Date,
+
+	# Current market value for the plan.
+	marketValue: Float,
+
+	# Plan accounts
+	accounts: [PlanAccount!]!
+}
+
+type PlanAccount implements Node {
+
+	id: ID!
+
+	# Account category
+	category: PlanAccountCategory,
+
+	# Manufacturer name
+	manufacturerName: String,
+
+	# Account name or number
+	accountName: String,
+
+	# Product name
+	productName: String,
+
+	# Current market value for the plan.
+	marketValue: Float,
+
+	# Last updated date of the plan.
+	marketValueUpdateDate: Date,
+
+	# Currency
+	currency: Currency,
+
+	# Load type
+	loadType: String,
+
+	# Fund Unit quantity
+	units: Float
+
+	# Fund unit price
+	unitPrice: Float
+
+	# GIC Term date
+	termDate: Date,
+
+	# GIC Certificate Nb
+	certificateNb: String,
+
+	# GIC Maturity Amount
+	maturityAmount: Float,
+
+	# GIC Maturity Date
+	maturityDate: Date,
+
+	# GIC Interest rate
+	interestRate: Float,
+
+	# GIC InitialAmount
+	initialAmount: Float
+}
+
+
+# Defines an insurance policy entity. Cannot be modified.
+type InsurancePolicy implements Node {
+	id: ID!,
+
+	# Policy's line of business.
+	lineOfBusiness: FieldValue,
+
+	# Policy insurer name.
+	ownerName: String,
+
+	# Policy insurer name.
+	carrierName: String,
+
+	# Policy number.
+	policyNb: String,
+
+	# Policy product name.
+	productName: String,
+
+	# Policy annual premium.
+	paymentAmount: Float,
+
+	# Payment mode (frequency)
+	paymentMode: PaymentMode,
+
+	# Policy annual premium.
+	annualPaymentAmount: Float,
+
+	# Effective/Issue date
+	effDate: Date,
+
+	# Term/End date
+	termDate: Date
+
+	# True if the contact is the owner of this insurance policy.
+	isOwner: Boolean!,
+
+	# True if the contact is a beneficary of this insurance policy.
+	isBeneficiary: Boolean!,
+
+	# True if the contact is insured by this insurance policy.
+	isInsured: Boolean!,
+
+	coverages: [InsuranceCoverage!]!
+
+}
+
+type InsuranceCoverage implements Node {
+	id: ID!,
+
+	# Coverage type
+	type: InsuranceCoverageType
+
+	# Coverage number
+	coverageNumber: String
+
+	# Policy product name.
+	productName: String,
+
+	# DEV: vd_cov_product_type
+	# Coverage product type
+	productType: FieldValue
+
+	# DEV vd_lives_type
+	# Lives types
+	livesType: FieldValue,
+
+	# Modal premium
+	modalPremiumAmount: Float,
+
+	# current/total amount of coverage benefit
+	amount: Float,
+
+	# Effective/Issue date
+	effDate: Date,
+
+	# True if the contact is insured by this insurance coverage.
+	isInsured: Boolean!,
+
+	insureds: [InsuranceInsured!]!
+}
+
+type InsuranceInsured {
+	name: String,
+	insuranceClass: String
+	smoker: Boolean
+}
+
+type PageInfo {
+	hasPreviousPage: Boolean,
+	previousPage: String,
+	hasNextPage: Boolean,
+	nextPage: String
+}
+
+# Inputs
+input ActivityListFilters {
+	# The activities need to be contained in the specified activity types in order to be displayed. This filter is mandatory.
+	agendaTypeIn: [ActivityType!]!
+
+	# If specified, filter activity based on completed flag.
+	isCompleted: Boolean
+
+	# Minimum startDate
+	minStartDate: DateTime
+
+	# Maximum startDate
+	maxStartDate: DateTime
+
+	# Sort order by sortDate
+	sortOrder: SortOrder
+
+}
+
+# Filters input of the contacts list.
+input ContactListFilters {
+	# If the combined values of firstName, middleName, and lastName contains the requested string, the filter will pass. Not setting the filter will ignore it.
+	nameContains: String
+
+	# If the combined values of firstName, middleName, and lastName starts with the requested string, the filter will pass. Not setting the filter will ignore it.
+	nameStartsWith: String
+
+	# user id
+	ownedBy: ID
+}
+
+# Main types
+type Query {
+	# Requests a single node
+	node(id: ID!): Node
+
+	# Current connected user
+	me: User
+
+	# Requests multiple, non-detailed contacts.
+	contacts(first: Int, after: Cursor, from: Cursor, filters: ContactListFilters): ContactConnection!
+
+	# Labels for specific group
+	fieldValues(type: FieldValueType): [FieldValue!]
+}
