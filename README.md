@@ -1,5 +1,3 @@
-# GraphQL Mock Project
+# GraphQL Schema (v1)
 
-## Running
-
-To run, use `npm install`, then `npm run nodemon` to start monitoring the `main.js` and `graphql` files.
+This project contains the GraphQL schema definition. It is not feature-complete yet.
