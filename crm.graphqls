@@ -100,6 +100,31 @@ enum FieldValueType {
 	CONTACT_TERRITORY
 }
 
+# Frequency
+enum InterestCompoundFrequency {
+	WEEKLY,
+	SEMIMONTHLY,
+	MONTHLY,
+	BIMONTHLY,
+	QUARTERLY,
+	HALF_YEARLY,
+	YEARLY,
+	DAILY
+}
+
+# Interest Installment mode
+enum InterestInstallmentMode {
+	MATURITY,
+	WEEKLY,
+	SEMIMONTHLY,
+	MONTHLY,
+	BIMONTHLY,
+	QUARTERLY,
+	HALF_YEARLY,
+	YEARLY,
+	DAILY
+}
+
 # Interfaces
 
 # Defines a node with an ID.
@@ -526,8 +551,8 @@ type Plan implements Node {
 	# Unique numerical identifier of the plan.
 	id: ID!,
 
-	# Plan description including type.
-	description: String,
+	# Plan description including type. Fake FieldValue.
+	description: FieldValue!,
 
 	# API DEV: vd_account_type_valid
 
@@ -535,7 +560,7 @@ type Plan implements Node {
 	accountType: FieldValue,
 
 	# Plan owner name.
-	ownerName: String
+	ownerName: String,
 
 	# Last updated date of the plan.
 	marketValueUpdateDate: Date,
@@ -598,7 +623,34 @@ type PlanAccount implements Node {
 	interestRate: Float,
 
 	# GIC InitialAmount
-	initialAmount: Float
+	initialAmount: Float,
+
+	# Initial amount date.
+	initialAmountDate: Date,
+
+	# Compound interest frequency
+	compound: InterestCompoundFrequency,
+
+	# Interest installment mode frequency
+	interestInstallmentMode: InterestInstallmentMode,
+
+	# List of interest rates
+	interestRates: [InterestRate!]!
+}
+
+# Defines an interest rate.
+type InterestRate implements Node {
+	# Unique identifier for the interest rate.
+	id: ID!,
+
+	# Actual interest rate.
+	interestRate: Float,
+
+	# Start date from which the interest rate applies.
+	dateStart: Date!,
+
+	# End date until the interest rate applies. Inclusive.
+	dateEnd: Date!
 }
 
 # Defines an insurance policy entity.
