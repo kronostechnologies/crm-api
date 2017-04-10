@@ -24,10 +24,10 @@ enum Language {
 	ENGLISH
 }
 
-# Contact type
+# Contact type (actually Form Type in CRM)
 enum ContactType {
-	INDIVIDUAL,
-	ORGANIZATION
+	CUS,
+	OTHER
 }
 
 # Activity type
@@ -307,8 +307,11 @@ type Contact implements Node {
 	# Contact rank.
 	rank: String,
 
-	# Contact type, either individual or organization.
+	# Contact type, form type in CRM
 	contactType: ContactType!,
+
+	# Determines whether or not this is an organization contact
+	isOrganization: Boolean!,
 
 	# Decease date of the contact.
 	deceaseDate: Date,
