@@ -97,7 +97,13 @@ enum FieldValueType {
 	CONTACT_REFERRED_BY,
 	CONTACT_HOBBY,
 	CONTACT_INDUSTRY,
-	CONTACT_TERRITORY
+	CONTACT_TERRITORY,
+	CONTACT_SEGMENT_1,
+	CONTACT_SEGMENT_2,
+	CONTACT_SEGMENT_3,
+	CONTACT_SEGMENT_4,
+	CONTACT_SEGMENT_5,
+	CONTACT_SEGMENT_6
 }
 
 # Frequency
@@ -302,6 +308,9 @@ type Contact implements Node {
 	# Last name of the contact.
 	lastName: String,
 
+	# Corporation/organization name.
+	corporationName: String,
+
 	# API DEV : IA Only. Leave blank for others
 
 	# Contact rank.
@@ -502,9 +511,6 @@ type Activity implements Node {
 
 	# Description of the activity.
 	description: String,
-
-	# Contact linked to this activity.
-	contact: Contact!
 
 	# Date the record was created.
 	creationDate: Date,
