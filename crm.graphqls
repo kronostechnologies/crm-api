@@ -6,6 +6,9 @@ scalar Date
 # Date with time, Format: YYYY-mm-dd hh:ii:ss (2017-12-30 23:58:59)
 scalar DateTime
 
+# Time, Format: hh:ii (23:58)
+scalar Time
+
 # Opaque cursor for page navigation on edge (base64 string)
 scalar Cursor
 
@@ -103,7 +106,8 @@ enum FieldValueType {
 	CONTACT_SEGMENT_3,
 	CONTACT_SEGMENT_4,
 	CONTACT_SEGMENT_5,
-	CONTACT_SEGMENT_6
+	CONTACT_SEGMENT_6,
+	ADDRESS_COUNTRY
 }
 
 # Frequency
@@ -236,10 +240,16 @@ type Address implements Node {
 	stateProvince: String,
 
 	# Country of the address.
-	country: String,
+	country: FieldValue,
 
 	# Postal/zip code of the address.
-	postalCode: String
+	postalCode: String,
+
+	# Date which the address became active.
+	dateSince: Date,
+
+	# City of the address.
+	city: String
 }
 
 # Representation of a phone entity
@@ -266,7 +276,10 @@ type Phone implements Node {
 	longDistance: Boolean,
 
 	# Notes of the phone number.
-	notes: String
+	notes: String,
+
+	# Phone number's extension.
+	extension: String
 }
 
 # Representation of an email entity
@@ -291,13 +304,139 @@ type Email implements Node {
 	notes: String
 }
 
-# Represents a contact entity
-type Contact implements Node {
+interface Contact {
+	# Contact type, form type in CRM
+	contactType: ContactType!,
+
+	# API DEV: Fetch with i_contact_class, it uses vdvalues too
+
+	# Contact categories/classes.
+	categories: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+
+	# Contact origins.
+	referredBy: [FieldValue],
+
+	# Addresses of the contact.
+	addresses: [Address],
+
+	# Phone numbers of the contact.
+	phones: [Phone],
+
+	# Emails of the contact.
+	emails: [Email],
+
+	# Activities of the contact. Can be sorted.
+	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
+
+	# Investments, or plans of the contact. (finance only)
+	plans: [Plan!]!,
+
+	# Insurance policies of the contact. (finance only)
+	policies: [InsurancePolicy!]!,
+
+	# Date the record was modified
+	creationDate: Date,
+
+	# Date the record was modified
+	lastUpdateDate: Date,
+
+	# API DEV : IA Only. Leave blank for others
+
+	# Contact rank.
+	rank: String,
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+
+	# Contact distribution lists
+	distributionLists: [FieldValue],
+
+	# List of websites for this contact.
+	websites: [Website!]!,
+
+	# Notes for the contact.
+	notes: String,
+
+	# Calculated initials of the contact.
+	initials: String
+}
+
+type OrganizationContact implements Node, Contact {
 	# Unique numerical identifier of the contact.
 	id: ID!,
 
+	# Corporation/organization name.
+	corporationName: String,
+
 	# Display name of the contact.
 	displayName: String,
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+
+	# Contact i_contact_activity_domain
+	industries: [FieldValue],
+
+	# Contact type, form type in CRM
+	contactType: ContactType!,
+
+	# API DEV: Fetch with i_contact_class, it uses vdvalues too
+
+	# Contact categories/classes.
+	categories: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+
+	# Contact origins.
+	referredBy: [FieldValue],
+
+	# Addresses of the contact.
+	addresses: [Address],
+
+	# Phone numbers of the contact.
+	phones: [Phone],
+
+	# Emails of the contact.
+	emails: [Email],
+
+	# Activities of the contact. Can be sorted.
+	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
+
+	# Investments, or plans of the contact. (finance only)
+	plans: [Plan!]!,
+
+	# Insurance policies of the contact. (finance only)
+	policies: [InsurancePolicy!]!,
+
+	# Date the record was modified
+	creationDate: Date,
+
+	# Date the record was modified
+	lastUpdateDate: Date,
+
+	# List of websites for this contact.
+	websites: [Website!]!,
+
+	# API DEV : IA Only. Leave blank for others
+
+	# Contact rank.
+	rank: String,
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+
+	# Contact distribution lists
+	distributionLists: [FieldValue],
+
+	# Notes for the contact.
+	notes: String,
+
+	# Calculated initials of the contact.
+	initials: String
+}
+
+type IndividualContact implements Node, Contact {
+	# Unique numerical identifier of the contact.
+	id: ID!,
 
 	# First name of the contact.
 	firstName: String,
@@ -307,20 +446,6 @@ type Contact implements Node {
 
 	# Last name of the contact.
 	lastName: String,
-
-	# Corporation/organization name.
-	corporationName: String,
-
-	# API DEV : IA Only. Leave blank for others
-
-	# Contact rank.
-	rank: String,
-
-	# Contact type, form type in CRM
-	contactType: ContactType!,
-
-	# Determines whether or not this is an organization contact
-	isOrganization: Boolean!,
 
 	# Decease date of the contact.
 	deceaseDate: Date,
@@ -349,35 +474,10 @@ type Contact implements Node {
 	# Contact's job.
 	job: Job,
 
-	# API DEV: Fetch with i_contact_class, it uses vdvalues too
-
-	# Contact categories/classes.
-	categories: [FieldValue],
-
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
-	# Contact distribution lists
-	distributionLists: [FieldValue],
-
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
-	# Contact origins.
-	referredBy: [FieldValue],
-
 	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
 
 	# Contact hobbies
-	hobbies: [FieldValue],
-
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
-	# Contact i_contact_activity_domain
-	industries: [FieldValue],
-
-	# API DEV: Fetch with vdvalues (vd_territory)
-
-	# Translated territory name of the contact. (finance only)
-	territory: FieldValue,
+	hobbies: [FieldValue]!,
 
 	# API DEV: Segments must be fetched with vd_seg# and vdvalues
 
@@ -389,6 +489,9 @@ type Contact implements Node {
 	seg5: FieldValue,
 	seg6: FieldValue,
 
+	# Translated territory name of the contact. (finance only)
+	territory: FieldValue,
+
 	# API DEV: Through fk_document_picture, it should be possible to fetch a public URL
 
 	# Picture URL of the contact.
@@ -399,6 +502,8 @@ type Contact implements Node {
 	# Gender of the contact.
 	gender: Gender,
 
+	# API DEV: Fetch with vdvalues (vd_territory)
+
 	# Birth date of the contact.
 	birthDate: Date,
 
@@ -406,6 +511,26 @@ type Contact implements Node {
 
 	# Client number.
 	clientNb: String,
+
+	# Mr., Ms., Mrs., etc.
+	greeting: FieldValue!,
+
+	# List of websites for this contact.
+	websites: [Website!]!,
+
+
+	# Contact type, form type in CRM
+	contactType: ContactType!,
+
+	# API DEV: Fetch with i_contact_class, it uses vdvalues too
+
+	# Contact categories/classes.
+	categories: [FieldValue],
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+
+	# Contact origins.
+	referredBy: [FieldValue],
 
 	# Addresses of the contact.
 	addresses: [Address],
@@ -429,7 +554,23 @@ type Contact implements Node {
 	creationDate: Date,
 
 	# Date the record was modified
-	lastUpdateDate: Date
+	lastUpdateDate: Date,
+
+	# API DEV : IA Only. Leave blank for others
+
+	# Contact rank.
+	rank: String,
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+
+	# Contact distribution lists
+	distributionLists: [FieldValue],
+
+	# Notes for the contact.
+	notes: String,
+
+	# Calculated initials of the contact.
+	initials: String
 }
 
 # Defines a contact edge (entry), used for pagination.
@@ -472,11 +613,23 @@ type Activity implements Node {
 	# True if the activity lasts all day.
 	allDay: Boolean!,
 
-	# Date & time when the activity starts.
-	startDate: DateTime,
+	# Computed date & time when the activity starts.
+	startDateTime: DateTime,
 
-	# Date & time when the activity ends.
-	endDate: DateTime,
+	# Computed date & time when the activity ends.
+	endDateTime: DateTime,
+
+	# Date when the activity starts.
+	startDate: Date,
+
+	# Date when the activity ends.
+	endDate: Date,
+
+	# Time when the activity starts.
+	startTime: Time,
+
+	# Time when the activity ends.
+	endTime: Time,
 
 	# Date & Time the activity was initially scheduled
 	initialDate: DateTime,
@@ -493,8 +646,11 @@ type Activity implements Node {
 	# Activity priority (1 to 5).
 	priority: Int,
 
-	# Alarm delay in minutes.
-	alarmDelay: Int,
+	# Returns true if a reminder is setup.
+	hasReminder: Boolean!,
+
+	# Reminder delay in minutes.
+	reminderDelay: Int,
 
 	# The recurrence rule for this event. The recurrence is a string conform to RFC 5545 (see RRULE http://tools.ietf.org/html/rfc5545#section-3.8.5.3).
 	recurrenceRule: String,
@@ -509,8 +665,8 @@ type Activity implements Node {
 
 	# API DEV: Contained in action_notes table
 
-	# Description of the activity.
-	description: String,
+	# Notes of the activity.
+	notes: String,
 
 	# Date the record was created.
 	creationDate: Date,
@@ -762,6 +918,17 @@ type InsuranceInsured {
 	smoker: Boolean
 }
 
+type Website implements Node {
+	# Unique numerical identifier for the website.
+	id: ID!,
+
+	# Website's URL.
+	url: String!,
+
+	# True if the website is the main one specified.
+	main: Boolean!
+}
+
 # Inputs
 input ActivityListFilters {
 	# The activities need to be contained in the specified activity types in order to be displayed. This filter is mandatory.
@@ -792,6 +959,12 @@ input ContactListFilters {
 	ownedBy: ID
 }
 
+input FieldValueFilter {
+	filterLocale: Language!,
+
+	startsWith: String
+}
+
 # Main types
 type Query {
 	# Requests a single node.
@@ -804,5 +977,5 @@ type Query {
 	contacts(first: Int, after: Cursor, from: Cursor, filters: ContactListFilters): ContactConnection!,
 
 	# Labels for specific group.
-	fieldValues(type: FieldValueType): [FieldValue!]
+	fieldValues(type: FieldValueType, filters: FieldValueFilter): [FieldValue!]
 }
