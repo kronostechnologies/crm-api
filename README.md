@@ -8,6 +8,8 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 
 ### 2017-05-17
 
+* Added `abbreviation` field to `OrganizationContact` type
+* Field `initials` now only belongs to `IndividualContact` type
 * Root query `fieldValues` argument `type` is now mandatory (non-null)
 * Field `country` in `Address` is now of type `String` instead of `FieldValue`
 * Added `EMAIL_TYPE` to `FieldValueType` enum

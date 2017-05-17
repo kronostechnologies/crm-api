@@ -358,10 +358,7 @@ interface Contact {
 	websites: [Website!]!,
 
 	# Notes for the contact.
-	notes: String,
-
-	# Calculated initials of the contact.
-	initials: String
+	notes: String
 }
 
 type OrganizationContact implements Node, Contact {
@@ -432,8 +429,8 @@ type OrganizationContact implements Node, Contact {
 	# Notes for the contact.
 	notes: String,
 
-	# Calculated initials of the contact.
-	initials: String
+	# Organization abbreviation
+	abbreviation: String
 }
 
 type IndividualContact implements Node, Contact {
