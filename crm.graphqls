@@ -107,7 +107,9 @@ enum FieldValueType {
 	CONTACT_SEGMENT_4,
 	CONTACT_SEGMENT_5,
 	CONTACT_SEGMENT_6,
-	ADDRESS_COUNTRY
+	ADDRESS_COUNTRY,
+	ADDRESS_CITY,
+	EMAIL_TYPE
 }
 
 # Frequency
@@ -240,7 +242,7 @@ type Address implements Node {
 	stateProvince: String,
 
 	# Country of the address.
-	country: FieldValue,
+	country: String,
 
 	# Postal/zip code of the address.
 	postalCode: String,
@@ -977,5 +979,5 @@ type Query {
 	contacts(first: Int, after: Cursor, from: Cursor, filters: ContactListFilters): ContactConnection!,
 
 	# Labels for specific group.
-	fieldValues(type: FieldValueType, filters: FieldValueFilter): [FieldValue!]
+	fieldValues(type: FieldValueType!, filters: FieldValueFilter): [FieldValue!]
 }

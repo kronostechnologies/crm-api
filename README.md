@@ -5,6 +5,15 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 
 ## Changelogs (most recent to oldest)
 
+
+### 2017-05-17
+
+* Root query `fieldValues` argument `type` is now mandatory (non-null)
+* Field `country` in `Address` is now of type `String` instead of `FieldValue`
+* Added `EMAIL_TYPE` to `FieldValueType` enum
+* Added `ADDRESS_CITY` to `FieldValueType` enum
+
+
 ### 2017-05-02
 
 * Splitted `Contact` type in two distinct types: `OrganizationContact` and `IndividualContact`.
