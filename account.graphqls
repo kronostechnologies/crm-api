@@ -42,46 +42,63 @@ type RemoteAccount implements Node {
 	email: String,
 	userLogin: String,
 	userDisplayName: String,
-
-	contactEnabled: Boolean!,
-	contactAccount: ContactAccount,
-
-	agendaEnabled: Boolean!,
-	agendaAccount: AgendaAccount,
-
-	mailEnabled: Boolean!,
-	mailAccount: MailAccount,
-
+	contactAccount: ContactAccount!,
+	agendaAccount: AgendaAccount!,
+	mailAccount: MailAccount!,
 	owner: User
 }
 
 type AgendaAccount {
+	enabled: Boolean!,
 	invitationEnabled: Boolean
 }
 
 type ContactAccount {
+	enabled: Boolean!,
 	syncAddresses: Boolean,
 	syncEmails: Boolean,
 	syncPhones: Boolean,
 }
 
 type MailAccount {
+	enabled: Boolean,
+	incoming: IncomingMailOptions,
+	outgoing: OutgoingMailOptions,
+}
+
+type IncomingMailOptions {
+
+	# Remote imap mail account
+	imap: ImapAccount,
+
+	# Deprecated getmail/pop3 account informations
+	getmail: GetmailAccount,
+}
+
+type OutgoingMailOptions {
+	replyTo: String,
+	# Custom smtp parameters
+	smtp: SmtpAccount,
+	# Deprecated
+	hasSpf: Boolean,
+}
+
+type ImapAccount {
 	host: String,
 	port: Int,
 	isSsl: Boolean,
 	userLogin: String,
-	# userPassword: String, Do not disclose passwords in api
-	replyTo: String,
+}
 
-	# Deprecated
-	hasSpf: Boolean,
-
-	# Custom smtp parameters
-	smtp: SmtpAccount,
-
-	# Deprecated getmail/pop3 parameters
-	getmail: GetmailAccount,
-
+type GetmailAccount {
+	enabled: Boolean,
+	type: GetmailAccountType,
+	host: String,
+	port: Int,
+	userLogin: String,
+	delete: Boolean,
+	deleteAfter: Int,
+	filterSpam: Boolean,
 }
 
 type SmtpAccount {
@@ -89,14 +106,6 @@ type SmtpAccount {
 	port: Int,
 	user: String,
 	encryption: SmtpEncryptionTypes,
-}
-
-type GetmailAccount {
-	enabled: Boolean,
-	type: GetmailAccountType,
-	delete: Boolean,
-	deleteAfter: Int,
-	filterSpam: Boolean,
 }
 
 input UserFilter {
@@ -110,7 +119,7 @@ input RemoteAccountsFilters {
 }
 
 
-type CreateRemoteAccountInput {
+input CreateRemoteAccountInput {
 	clientMutationId: String,
 	type: RemoteAccountType!
 	host: String!,
@@ -118,51 +127,76 @@ type CreateRemoteAccountInput {
 	userLogin: String!,
 	userDisplayName: String!,
 	userPassword: String,
-	oauth2RefreshToken: String,
+	# oauth2RefreshToken: String,
 	# If not provided, description is generated
 	description: String,
 }
 
-type CreateRemoteAccountPayload {
+input UpdateRemoteAccountInput {
 	clientMutationId: String,
-	remoteAccount: RemoteAccount,
+	host: String!,
+	email: String!,
+	userLogin: String!,
+	userDisplayName: String!,
+	userPassword: String,
 	description: String,
 }
 
-type EnableContactAccountInput {
+type CreateUpdateRemoteAccountPayload {
+	clientMutationId: String,
+	remoteAccount: RemoteAccount,
+}
+
+input EnableContactAccountInput {
 	remoteAccountId: Id!,
 	syncAddresses: Boolean,
 	syncEmails: Boolean,
 	syncPhones: Boolean,
 }
 
-type EnableAgendaAccountInput {
+input EnableAgendaAccountInput {
 	remoteAccountId: Id!,
 	invitationEnabled: Boolean,
 }
 
-type EnableMailAccountInput {
+input EnableMailAccountInput {
 	remoteAccountId: Id!,
+
+	incoming: EnableIncomingMailAcountInput,
+
+	outgoing: EnableOutgoingMailAcountInput,
+}
+
+input EnableIncomingMailAcountInput {
+	imap: EnableImapMailAccountInput,
+
+	getmail: EnableGetmailAccountInput,
+}
+
+input EnableOutgoingMailAcountInput {
+	replyTo: String,
+	smtp: SmtpAccount,
+}
+
+input EnableImapMailAccountInput {
 	host: String!,
 	port: Int,
 	isSsl: Boolean,
 	userLogin: String!,
 	userPassword: String,
 	replyTo: String,
-	# Custom smtp parameters
-	smtp: SmtpAccount,
 }
 
-type EnableGetmailAccountInput {
-	remoteAccountId: Id!,
-	host: String!,
+input EnableGetmailAccountInput {
+	enabled: Boolean,
+	type: GetmailAccountType,
+	host: String,
 	port: Int,
-	userLogin: String!,
+	userLogin: String,
 	userPassword: String,
-	replyTo: String,
-	# Custom smtp parameters
-	smtp: SmtpAccount,
-	getmail: GetmailAccount!
+	delete: Boolean,
+	deleteAfter: Int,
+	filterSpam: Boolean,
 }
 
 type Query {
@@ -175,7 +209,9 @@ type Query {
 
 type Mutation {
 
-	createRemoteAccount(account: CreateRemoteAccountInput): CreateRemoteAccountPayload,
+	createRemoteAccount(account: CreateRemoteAccountInput): CreateUpdateRemoteAccountPayload,
+
+	updateRemoteAccount(account: UpdateRemoteAccountInput): CreateUpdateRemoteAccountPayload,
 
 	enableContactAccount(contactAccount: EnableContactAccountInput): RemoteAccount,
 
@@ -185,10 +221,8 @@ type Mutation {
 
 	disableAgendaAccount(remoteAccountId: ID!),
 
+	# Enable remote IMAP mail account
 	enableMailAccount(mailAccount: EnableMailAccountInput),
-
-	# Enable legacy pop3/getmail mail account
-	enableGetmailMailAccount(mailAccount: EnableGetmailMailAccountInput),
 
 	disableAgendaAccount(remoteAccountId: ID!),
 }
