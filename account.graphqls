@@ -227,4 +227,8 @@ type Mutation {
 	enableMailAccount(mailAccount: EnableMailAccountInput),
 
 	disableAgendaAccount(remoteAccountId: ID!),
+
+	# TODO: setMainRemoteAccount
+	# TODO: setPriority
+	# TODO: setPassword
 }
