@@ -1,0 +1,194 @@
+
+
+enum RemoteAccountType {
+	GOOGLE,
+	EXCHANGE,
+	OFFICE365,
+	OUTLOOK,
+	GETMAIL
+}
+
+enum GetmailAccountType {
+	POP3,
+	POP3SSl,
+	IMAP,
+	IMAPSSL
+}
+
+enum SmtpEncryptionTypes {
+	NONE,
+	TLS,
+	SSL
+}
+
+
+interface Node {
+	id: ID!
+}
+
+type User implements Node {
+	id: ID!,
+}
+
+type RemoteAccount implements Node {
+	id: ID!,
+	type: RemoteAccountType!
+	description: String,
+	isMain: Boolean,
+	priority: Int,
+
+	# EWS or Gmail API Host
+	host: String,
+	email: String,
+	userLogin: String,
+	userDisplayName: String,
+
+	contactEnabled: Boolean!,
+	contactAccount: ContactAccount,
+
+	agendaEnabled: Boolean!,
+	agendaAccount: AgendaAccount,
+
+	mailEnabled: Boolean!,
+	mailAccount: MailAccount,
+
+	owner: User
+}
+
+type AgendaAccount {
+	invitationEnabled: Boolean
+}
+
+type ContactAccount {
+	syncAddresses: Boolean,
+	syncEmails: Boolean,
+	syncPhones: Boolean,
+}
+
+type MailAccount {
+	host: String,
+	port: Int,
+	isSsl: Boolean,
+	userLogin: String,
+	# userPassword: String, Do not disclose passwords in api
+	replyTo: String,
+
+	# Deprecated
+	hasSpf: Boolean,
+
+	# Custom smtp parameters
+	smtp: SmtpAccount,
+
+	# Deprecated getmail/pop3 parameters
+	getmail: GetmailAccount,
+
+}
+
+type SmtpAccount {
+	host: String!,
+	port: Int,
+	user: String,
+	encryption: SmtpEncryptionTypes,
+}
+
+type GetmailAccount {
+	enabled: Boolean,
+	type: GetmailAccountType,
+	delete: Boolean,
+	deleteAfter: Int,
+	filterSpam: Boolean,
+}
+
+input UserFilter {
+	id: ID!,
+	email: String,
+	identifier: String,
+}
+
+input RemoteAccountsFilters {
+	owner: UserFilter,
+}
+
+
+type CreateRemoteAccountInput {
+	clientMutationId: String,
+	type: RemoteAccountType!
+	host: String!,
+	email: String!,
+	userLogin: String!,
+	userDisplayName: String!,
+	userPassword: String,
+	oauth2RefreshToken: String,
+	# If not provided, description is generated
+	description: String,
+}
+
+type CreateRemoteAccountPayload {
+	clientMutationId: String,
+	remoteAccount: RemoteAccount,
+	description: String,
+}
+
+type EnableContactAccountInput {
+	remoteAccountId: Id!,
+	syncAddresses: Boolean,
+	syncEmails: Boolean,
+	syncPhones: Boolean,
+}
+
+type EnableAgendaAccountInput {
+	remoteAccountId: Id!,
+	invitationEnabled: Boolean,
+}
+
+type EnableMailAccountInput {
+	remoteAccountId: Id!,
+	host: String!,
+	port: Int,
+	isSsl: Boolean,
+	userLogin: String!,
+	userPassword: String,
+	replyTo: String,
+	# Custom smtp parameters
+	smtp: SmtpAccount,
+}
+
+type EnableGetmailAccountInput {
+	remoteAccountId: Id!,
+	host: String!,
+	port: Int,
+	userLogin: String!,
+	userPassword: String,
+	replyTo: String,
+	# Custom smtp parameters
+	smtp: SmtpAccount,
+	getmail: GetmailAccount!
+}
+
+type Query {
+	# Requests a single node
+	node(id: ID!): Node
+
+	remoteAccounts(filters: RemoteAccountsFilters): RemoteAccount,
+
+}
+
+type Mutation {
+
+	createRemoteAccount(account: CreateRemoteAccountInput): CreateRemoteAccountPayload,
+
+	enableContactAccount(contactAccount: EnableContactAccountInput): RemoteAccount,
+
+	disableContactAccount(remoteAccountId: ID!),
+
+	enableAgendaAccount(agendaAccount: EnableAgendaAccountInput),
+
+	disableAgendaAccount(remoteAccountId: ID!),
+
+	enableMailAccount(mailAccount: EnableMailAccountInput),
+
+	# Enable legacy pop3/getmail mail account
+	enableGetmailMailAccount(mailAccount: EnableGetmailMailAccountInput),
+
+	disableAgendaAccount(remoteAccountId: ID!),
+}
