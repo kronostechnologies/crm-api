@@ -62,20 +62,17 @@ type ContactAccount {
 
 type MailAccount {
 	enabled: Boolean,
-	incoming: IncomingMailOptions,
-	outgoing: OutgoingMailOptions,
-}
 
-type IncomingMailOptions {
+	# INCOMING
 
 	# Remote imap mail account
 	imap: ImapAccount,
 
 	# Deprecated getmail/pop3 account informations
 	getmail: GetmailAccount,
-}
 
-type OutgoingMailOptions {
+	# OUTGOING
+
 	replyTo: String,
 	# Custom smtp parameters
 	smtp: SmtpAccount,
@@ -96,16 +93,16 @@ type GetmailAccount {
 	host: String,
 	port: Int,
 	userLogin: String,
-	delete: Boolean,
-	deleteAfter: Int,
+	remoteDelete: Boolean,
+	remoteDeleteAfter: Int,
 	filterSpam: Boolean,
 }
 
 type SmtpAccount {
 	host: String!,
 	port: Int,
-	user: String,
-	encryption: SmtpEncryptionTypes,
+	userLogin: String,
+	encryptionType: SmtpEncryptionTypes,
 }
 
 input RemoteAccountsFilters {
@@ -125,6 +122,7 @@ input CreateRemoteAccountInput {
 	# oauth2RefreshToken: String,
 	# If not provided, description is generated
 	description: String,
+	ownerId: ID!,
 }
 
 input UpdateRemoteAccountInput {
@@ -157,18 +155,13 @@ input EnableAgendaAccountInput {
 input EnableMailAccountInput {
 	remoteAccountId: Id!,
 
-	incoming: EnableIncomingMailAcountInput,
+	## INCOMING
 
-	outgoing: EnableOutgoingMailAcountInput,
-}
-
-input EnableIncomingMailAcountInput {
 	imap: EnableImapMailAccountInput,
-
 	getmail: EnableGetmailAccountInput,
-}
 
-input EnableOutgoingMailAcountInput {
+	## OUTGOING
+
 	replyTo: String,
 	smtp: SmtpAccountInput,
 }
@@ -211,24 +204,33 @@ type Query {
 
 type Mutation {
 
-	createRemoteAccount(account: CreateRemoteAccountInput): CreateUpdateRemoteAccountPayload,
+	createRemoteAccount(remoteAccount: CreateRemoteAccountInput): CreateUpdateRemoteAccountPayload,
 
-	updateRemoteAccount(account: UpdateRemoteAccountInput): CreateUpdateRemoteAccountPayload,
+	updateRemoteAccount(remoteAccount: UpdateRemoteAccountInput): CreateUpdateRemoteAccountPayload,
+
+	deleteRemoteAccount(remoteAccountId: ID!),
 
 	enableContactAccount(contactAccount: EnableContactAccountInput): RemoteAccount,
 
+	# TODO: updateContactAccount(),
+
 	disableContactAccount(remoteAccountId: ID!),
 
-	enableAgendaAccount(agendaAccount: EnableAgendaAccountInput),
+	enableAgendaAccount(agendaAccount: EnableAgendaAccountInput): RemoteAccount,
+
+	# TODO: updateAgendaAccount(),
 
 	disableAgendaAccount(remoteAccountId: ID!),
 
+	# TODO: updateMailAccount(),
+
 	# Enable remote IMAP mail account
-	enableMailAccount(mailAccount: EnableMailAccountInput),
+	enableMailAccount(mailAccount: EnableMailAccountInput): RemoteAccount,
 
 	disableAgendaAccount(remoteAccountId: ID!),
 
 	# TODO: setMainRemoteAccount
-	# TODO: setPriority
+	# TODO: setPriority?
 	# TODO: setPassword
+	# TODO: setOAuth2RefreshToken?
 }
