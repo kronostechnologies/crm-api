@@ -116,13 +116,16 @@ input CreateRemoteAccountInput {
 	type: RemoteAccountType!
 	host: String!,
 	email: String!,
-	userLogin: String!,
 	userDisplayName: String!,
-	userPassword: String,
-	# oauth2RefreshToken: String,
+	credentials: AccountCredentialsInput,
 	# If not provided, description is generated
 	description: String,
 	ownerId: ID!,
+}
+
+type CreateRemoteAccountPayload {
+	clientMutationId: String,
+	remoteAccount: RemoteAccount,
 }
 
 input UpdateRemoteAccountInput {
@@ -131,39 +134,75 @@ input UpdateRemoteAccountInput {
 	email: String!,
 	userLogin: String!,
 	userDisplayName: String!,
-	userPassword: String,
 	description: String,
 }
 
-type CreateUpdateRemoteAccountPayload {
+type UpdateRemoteAccountPayload {
 	clientMutationId: String,
-	remoteAccount: RemoteAccount,
+	remoteAccountId: ID!,
 }
 
-input EnableContactAccountInput {
+input UpdateRemoteAccountCredentialsInput {
+	clientMutationId: String,
+	remoteAccountId: Id!,
+	credentials: AccountCredentialsInput,
+}
+
+input ContactAccountInput {
+	clientMutationId: String,
 	remoteAccountId: Id!,
 	syncAddresses: Boolean,
 	syncEmails: Boolean,
 	syncPhones: Boolean,
 }
 
-input EnableAgendaAccountInput {
+input AgendaAccountInput {
+	clientMutationId: String,
 	remoteAccountId: Id!,
 	invitationEnabled: Boolean,
 }
 
-input EnableMailAccountInput {
+input EnableImapMailAccountInput {
+	clientMutationId: String,
 	remoteAccountId: Id!,
-
-	## INCOMING
-
-	imap: EnableImapMailAccountInput,
-	getmail: EnableGetmailAccountInput,
-
-	## OUTGOING
-
+	imap: ImapAccountInput,
 	replyTo: String,
 	smtp: SmtpAccountInput,
+}
+
+input EnableGetmailMailAccountInput {
+	clientMutationId: String,
+	remoteAccountId: Id!,
+	getmail: GetmailAccountInput,
+	replyTo: String,
+	smtp: SmtpAccountInput,
+}
+
+
+input UpdateImapMailAccountInput {
+	clientMutationId: String,
+	remoteAccountId: Id!,
+	imap: ImapAccountInput!,
+	replyTo: String,
+}
+
+input UpdateGetmailMailAccountInput {
+	clientMutationId: String,
+	remoteAccountId: Id!,
+	getmail: GetmailAccountInput!,
+	replyTo: String,# discutable
+}
+
+input UpdateSmtpMailAccountInput {
+	clientMutationId: String,
+	remoteAccountId: Id!,
+	smtp: SmtpAccountInput!,
+}
+
+input AccountCredentialsInput {
+	userLogin: String!,
+	userPassword: String,
+	oauth2RefreshToken: String,
 }
 
 input SmtpAccountInput {
@@ -173,26 +212,62 @@ input SmtpAccountInput {
 	encryption: SmtpEncryptionTypes,
 }
 
-input EnableImapMailAccountInput {
+input ImapAccountInput {
 	host: String!,
 	port: Int,
 	isSsl: Boolean,
-	userLogin: String!,
-	userPassword: String,
 	replyTo: String,
 }
 
-input EnableGetmailAccountInput {
+input GetmailAccountInput {
 	enabled: Boolean,
 	type: GetmailAccountType,
 	host: String,
 	port: Int,
-	userLogin: String,
-	userPassword: String,
 	delete: Boolean,
 	deleteAfter: Int,
 	filterSpam: Boolean,
 }
+
+input SetMainRemoteAccountInput {
+	clientMutationId: String,
+	remoteAccountId: Id!,
+}
+
+input SortRemoteAccountsInput {
+	remoteAccounts: [SortRemoteAccountInput!]!,
+}
+
+input SortRemoteAccountInput {
+	clientMutationId: String,
+	remoteAccountId: ID!,
+	sortValue: Int,
+}
+
+type SortRemoteAccountsPayload {
+	remoteAccounts: [SortRemoteAccountInput!]!,
+}
+
+input DeleteRemoteAccountInput {
+	clientMutationId: String,
+	remoteAccountId: ID!,
+}
+
+input DisableContactAccountInput {
+	clientMutationId: String,
+	remoteAccountId: ID!,
+}
+
+input DisableAgendaAccountInput {
+	clientMutationId: String,
+	remoteAccountId: ID!,
+}
+
+input DisableMailAccountInput {
+	clientMutationId: String,
+	remoteAccountId: ID!,
+}
+
 
 type Query {
 	# Requests a single node
@@ -204,33 +279,62 @@ type Query {
 
 type Mutation {
 
-	createRemoteAccount(remoteAccount: CreateRemoteAccountInput): CreateUpdateRemoteAccountPayload,
+	# Create a new remote account
+	createRemoteAccount(input: CreateRemoteAccountInput!): CreateRemoteAccountPayload,
 
-	updateRemoteAccount(remoteAccount: UpdateRemoteAccountInput): CreateUpdateRemoteAccountPayload,
+	# Update remote account global fields
+	updateRemoteAccount(input: UpdateRemoteAccountInput!): UpdateRemoteAccountPayload,
 
-	deleteRemoteAccount(remoteAccountId: ID!),
+	# Set the global login and password for the remote account
+	updateRemoteAccountCredentials(input: UpdateRemoteAccountCredentialsInput!): UpdateRemoteAccountPayload,
 
-	enableContactAccount(contactAccount: EnableContactAccountInput): RemoteAccount,
+	# Delete a remote account
+	deleteRemoteAccount(input: DeleteRemoteAccountInput!): UpdateRemoteAccountPayload,
 
-	# TODO: updateContactAccount(),
+	# Enable contact integration for a remote account
+	enableContactAccount(input: ContactAccountInput!): UpdateRemoteAccountPayload,
 
-	disableContactAccount(remoteAccountId: ID!),
+	# Update contact parameters for a remote account
+	updateContactAccount(input: ContactAccountInput!): UpdateRemoteAccountPayload,
 
-	enableAgendaAccount(agendaAccount: EnableAgendaAccountInput): RemoteAccount,
+	# Disable contact integration for a remote account
+	disableContactAccount(input: DisableContactAccountInput!): UpdateRemoteAccountPayload,
 
-	# TODO: updateAgendaAccount(),
+	# Enable agenda/calendar integration for a remote account
+	enableAgendaAccount(input: UpdateAccountPayload!): UpdateRemoteAccountPayload,
 
-	disableAgendaAccount(remoteAccountId: ID!),
+	# Update agenda/calendar parameters for a remote account
+	updateAgendaAccount(input: UpdateAccountPayload!): UpdateRemoteAccountPayload,
 
-	# TODO: updateMailAccount(),
+	# Disable agenda/calendar integration for a remote account
+	disableAgendaAccount(input: DisableAgendaAccountInput!): UpdateRemoteAccountPayload,
 
-	# Enable remote IMAP mail account
-	enableMailAccount(mailAccount: EnableMailAccountInput): RemoteAccount,
+	# Enable a IMAP based mail account for the remote account. Use with GOOGLE, EXCHANGE, OFFICE365 and OUTLOOK accounts
+	enableImapMailAccount(input: EnableImapMailAccountInput!): UpdateRemoteAccountPayload,
 
-	disableAgendaAccount(remoteAccountId: ID!),
+	# Update IMAP based mail account parameters for remote account
+	updateImapMailAccount(input: UpdateImapMailAccountInput!): UpdateRemoteAccountPayload,
 
-	# TODO: setMainRemoteAccount
-	# TODO: setPriority?
-	# TODO: setPassword
-	# TODO: setOAuth2RefreshToken?
+	# Enable a Getmail/POP3 based mail account for the remote account. Use with GETMAIL accounts
+	enableGetmailMailAccount(input: EnableGetmailMailAccountInput!): UpdateRemoteAccountPayload,
+
+	# Update Getmail/POP3 based mail account parameters for remote account
+	updateGetmailMailAccount(input: UpdateGetmailMailAccountInput!): UpdateRemoteAccountPayload,
+
+	# Set or update custom smtp parameters for a remote account
+	updateMailAccountSmtp(input: UpdateMailAccountSmtpInput!): UpdateRemoteAccountPayload,
+
+	# Update custom smtp login and password for a remote acount
+	updateMailAccountSmtpCredentials(input: UpdateRemoteAccountCredentialsInput!): UpdateRemoteAccountPayload,
+
+	# Disable mail integration for a remote account
+	disableMailAccount(input: DisableMailAccountInput!): UpdateRemoteAccountPayload,
+
+	# Set a remote accont as the main account for it's owner
+	setMainRemoteAccount(input: SetMainRemoteAccountInput!): UpdateRemoteAccountPayload,
+
+	# Set the sort value for one or many accounts for a user.  All accounts must belong to the same user.
+	# Returns the final sort values for all user accounts
+	sortRemoteAccounts(input: SortRemoteAccountsInput!): SortRemoteAccountsPayload,
+
 }
