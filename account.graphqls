@@ -144,13 +144,13 @@ type UpdateRemoteAccountPayload {
 
 input UpdateRemoteAccountCredentialsInput {
 	clientMutationId: String,
-	remoteAccountId: Id!,
+	remoteAccountId: ID!,
 	credentials: AccountCredentialsInput,
 }
 
 input ContactAccountInput {
 	clientMutationId: String,
-	remoteAccountId: Id!,
+	remoteAccountId: ID!,
 	syncAddresses: Boolean,
 	syncEmails: Boolean,
 	syncPhones: Boolean,
@@ -158,13 +158,13 @@ input ContactAccountInput {
 
 input AgendaAccountInput {
 	clientMutationId: String,
-	remoteAccountId: Id!,
+	remoteAccountId: ID!,
 	invitationEnabled: Boolean,
 }
 
 input EnableImapMailAccountInput {
 	clientMutationId: String,
-	remoteAccountId: Id!,
+	remoteAccountId: ID!,
 	imap: ImapAccountInput,
 	replyTo: String,
 	smtp: SmtpAccountInput,
@@ -172,7 +172,7 @@ input EnableImapMailAccountInput {
 
 input EnableGetmailMailAccountInput {
 	clientMutationId: String,
-	remoteAccountId: Id!,
+	remoteAccountId: ID!,
 	getmail: GetmailAccountInput,
 	replyTo: String,
 	smtp: SmtpAccountInput,
@@ -181,21 +181,21 @@ input EnableGetmailMailAccountInput {
 
 input UpdateImapMailAccountInput {
 	clientMutationId: String,
-	remoteAccountId: Id!,
+	remoteAccountId: ID!,
 	imap: ImapAccountInput!,
 	replyTo: String,
 }
 
 input UpdateGetmailMailAccountInput {
 	clientMutationId: String,
-	remoteAccountId: Id!,
+	remoteAccountId: ID!,
 	getmail: GetmailAccountInput!,
-	replyTo: String,# discutable
+	replyTo: String,
 }
 
-input UpdateSmtpMailAccountInput {
+input UpdateMailAccountSmtpInput {
 	clientMutationId: String,
-	remoteAccountId: Id!,
+	remoteAccountId: ID!,
 	smtp: SmtpAccountInput!,
 }
 
@@ -231,7 +231,7 @@ input GetmailAccountInput {
 
 input SetMainRemoteAccountInput {
 	clientMutationId: String,
-	remoteAccountId: Id!,
+	remoteAccountId: ID!,
 }
 
 input SortRemoteAccountsInput {
@@ -245,7 +245,13 @@ input SortRemoteAccountInput {
 }
 
 type SortRemoteAccountsPayload {
-	remoteAccounts: [SortRemoteAccountInput!]!,
+	remoteAccounts: [SortRemoteAccountPayload!]!,
+}
+
+type SortRemoteAccountPayload {
+	clientMutationId: String,
+	remoteAccountId: ID!,
+	sortValue: Int,
 }
 
 input DeleteRemoteAccountInput {
@@ -301,10 +307,10 @@ type Mutation {
 	disableContactAccount(input: DisableContactAccountInput!): UpdateRemoteAccountPayload,
 
 	# Enable agenda/calendar integration for a remote account
-	enableAgendaAccount(input: UpdateAccountPayload!): UpdateRemoteAccountPayload,
+	enableAgendaAccount(input: AgendaAccountInput!): UpdateRemoteAccountPayload,
 
 	# Update agenda/calendar parameters for a remote account
-	updateAgendaAccount(input: UpdateAccountPayload!): UpdateRemoteAccountPayload,
+	updateAgendaAccount(input: AgendaAccountInput!): UpdateRemoteAccountPayload,
 
 	# Disable agenda/calendar integration for a remote account
 	disableAgendaAccount(input: DisableAgendaAccountInput!): UpdateRemoteAccountPayload,
