@@ -485,6 +485,7 @@ type Query {
 
 }
 
+
 type Mutation {
 	# Creates a new remote account.
 	createRemoteAccount(input: CreateRemoteAccountInput!): CreateRemoteAccountResponse,
