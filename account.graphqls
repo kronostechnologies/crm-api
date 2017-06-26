@@ -205,7 +205,7 @@ input CreateRemoteAccountCredentialsInput {
 	userPassword: String!
 }
 
-input AlterRemoteAccountCredentialsInput {
+input UpdateRemoteAccountCredentialsInput {
 	# Username
 	userLogin: String,
 
@@ -213,7 +213,7 @@ input AlterRemoteAccountCredentialsInput {
 	userPassword: String
 }
 
-input AlterGetmailServiceInput {
+input UpdateGetmailServiceInput {
 	# True if the Getmail service should remotely delete mails.
 	remoteDelete: Boolean,
 
@@ -232,7 +232,7 @@ input CreateRemoteAccountHostInput {
 	port: Int!
 }
 
-input AlterRemoteAccountHostInput {
+input UpdateRemoteAccountHostInput {
 	# Hostname
 	host: String,
 
@@ -269,15 +269,15 @@ input CreateEWSMailServiceInput {
 	# ToDo: Check. SMTP is set from remote account host, username, password. What about encryption & port?
 }
 
-input AlterEWSMailServiceInput {
+input UpdateEWSMailServiceInput {
 	# True if the mail service is to be enabled.
 	enabled: bool!,
 
 	# IMAP credentials data.
-	imapCredentials: AlterRemoteAccountCredentialsInput,
+	imapCredentials: UpdateRemoteAccountCredentialsInput,
 
 	# Host & port for the connection to IMAP.
-	imapHost: AlterRemoteAccountHostInput
+	imapHost: UpdateRemoteAccountHostInput
 	# ToDo: Check. SMTP is set from remote account host, username, password. What about encryption & port?
 }
 
@@ -290,12 +290,12 @@ input CreateEWSProviderMailServiceInput {
 	# ToDo: Check. Same at last. SMTP is set from remote account username, password. Host, encryption, and ports are forced by provider.
 }
 
-input AlterEWSProviderMailServiceInput {
+input UpdateEWSProviderMailServiceInput {
 	# True if the mail service is to be enabled.
 	enabled: bool!,
 
 	# IMAP credentials data.
-	imapCredentials: AlterRemoteAccountCredentialsInput
+	imapCredentials: UpdateRemoteAccountCredentialsInput
 	# ToDo: Check. Same at last. SMTP is set from remote account username, password. Host, encryption, and ports are forced by provider.
 }
 
@@ -320,7 +320,7 @@ input CreateRemoteAccountBaseInfoInput {
 	# ToDo: Check. email field... email === replyTo?
 }
 
-input AlterRemoteAccountBaseInfoInput {
+input UpdateRemoteAccountBaseInfoInput {
 	# Sort priority. Defaults to last item in list.
 	priority: Int,
 
@@ -453,7 +453,7 @@ input DeleteRemoteAccountRequest {
 	remoteAccountId: ID!
 }
 
-input AlterEWSRemoteAccountContactServiceRequest {
+input UpdateEWSRemoteAccountContactServiceRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -464,7 +464,7 @@ input AlterEWSRemoteAccountContactServiceRequest {
 	contactService: ContactServiceInput!
 }
 
-input AlterEWSRemoteAccountMailServiceRequest {
+input UpdateEWSRemoteAccountMailServiceRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -472,10 +472,10 @@ input AlterEWSRemoteAccountMailServiceRequest {
 	remoteAccountId: ID!,
 
 	# Mail service data for the EWS account.
-	mailService: AlterEWSMailServiceInput!
+	mailService: UpdateEWSMailServiceInput!
 }
 
-input AlterEWSProviderRemoteAccountMailServiceRequest {
+input UpdateEWSProviderRemoteAccountMailServiceRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -483,10 +483,10 @@ input AlterEWSProviderRemoteAccountMailServiceRequest {
 	remoteAccountId: ID!,
 
 	# Mail service data for the EWS account.
-	mailService: AlterEWSProviderMailServiceInput!
+	mailService: UpdateEWSProviderMailServiceInput!
 }
 
-input AlterEWSRemoteAccountAgendaServiceRequest {
+input UpdateEWSRemoteAccountAgendaServiceRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -497,7 +497,7 @@ input AlterEWSRemoteAccountAgendaServiceRequest {
 	agendaService: AgendaServiceInput!	
 }
 
-input AlterEWSRemoteAccountCredentialsRequest {
+input UpdateEWSRemoteAccountCredentialsRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -505,10 +505,10 @@ input AlterEWSRemoteAccountCredentialsRequest {
 	remoteAccountId: ID!,
 
 	# EWS credentials data.
-	credentials: AlterRemoteAccountCredentialsInput
+	credentials: UpdateRemoteAccountCredentialsInput
 }
 
-input AlterEWSRemoteAccountHostRequest {
+input UpdateEWSRemoteAccountHostRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -516,13 +516,13 @@ input AlterEWSRemoteAccountHostRequest {
 	remoteAccountId: ID!,
 
 	# EWS host data.
-	ewsHost: AlterRemoteAccountHostInput!,
+	ewsHost: UpdateRemoteAccountHostInput!,
 
 	# True if SSL is required by the EWS host.
 	isSsl: Boolean
 }
 
-input AlterGoogleRemoteAccountCredentialsRequest {
+input UpdateGoogleRemoteAccountCredentialsRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -536,7 +536,7 @@ input AlterGoogleRemoteAccountCredentialsRequest {
 	refreshToken: String
 }
 
-input AlterGetmailRemoteAccountImapCredentialsRequest {
+input UpdateGetmailRemoteAccountImapCredentialsRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -544,10 +544,10 @@ input AlterGetmailRemoteAccountImapCredentialsRequest {
 	remoteAccountId: ID!,
 
 	# IMAP credentials data.
-	imapCredentials: AlterRemoteAccountCredentialsInput!
+	imapCredentials: UpdateRemoteAccountCredentialsInput!
 }
 
-input AlterGetmailRemoteAccountSmtpCredentialsRequest {
+input UpdateGetmailRemoteAccountSmtpCredentialsRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -555,10 +555,10 @@ input AlterGetmailRemoteAccountSmtpCredentialsRequest {
 	remoteAccountId: ID!,
 
 	# SMTP credentials for the Getmail account to set.
-	smtpCredentials: AlterRemoteAccountCredentialsInput!
+	smtpCredentials: UpdateRemoteAccountCredentialsInput!
 }
 
-input AlterGetmailRemoteAccountServiceRequest {
+input UpdateGetmailRemoteAccountServiceRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -566,10 +566,10 @@ input AlterGetmailRemoteAccountServiceRequest {
 	remoteAccountId: ID!,
 
 	# Getmail service to set for the remote account. 
-	getmailService: AlterGetmailServiceInput!
+	getmailService: UpdateGetmailServiceInput!
 }
 
-input AlterRemoteAccountBaseInfoRequest {
+input UpdateRemoteAccountBaseInfoRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -577,10 +577,10 @@ input AlterRemoteAccountBaseInfoRequest {
 	remoteAccountId: ID!,
 
 	# Base information for the remote account.
-	baseInfo: AlterRemoteAccountBaseInfoInput!
+	baseInfo: UpdateRemoteAccountBaseInfoInput!
 }
 
-input SetMainRemoteAccountInput {
+input SetMainRemoteAccountRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
 
@@ -588,7 +588,7 @@ input SetMainRemoteAccountInput {
 	remoteAccountId: ID!
 }
 
-input SortRemoteAccountsInput {
+input SortRemoteAccountsRequest {
 	# List of remote account sort order to set.
 	remoteAccounts: [SortRemoteAccountInput!]!
 }
@@ -647,39 +647,39 @@ type Mutation {
 	# Deletes a remote account.
 	deleteRemoteAccount(input: DeleteRemoteAccountRequest!): DeleteRemoteAccountResponse!,
 
-	# Alters an EWS remote account contact service. This supports provider accounts.
-	alterEWSRemoteAccountContactService(input: AlterEWSRemoteAccountContactServiceRequest!): UpdateRemoteAccountResponse!,
+	# Updates an EWS remote account contact service. This supports provider accounts.
+	updateEWSRemoteAccountContactService(input: UpdateEWSRemoteAccountContactServiceRequest!): UpdateRemoteAccountResponse!,
 
-	# Alters an EWS remote account mail service. This does not support provider accounts (use alterEWSProviderRemoteAccountMailService instead).
-	alterEWSRemoteAccountMailService(input: AlterEWSRemoteAccountMailServiceRequest!): UpdateRemoteAccountResponse!,
+	# Updates an EWS remote account mail service. This does not support provider accounts (use updateEWSProviderRemoteAccountMailService instead).
+	updateEWSRemoteAccountMailService(input: UpdateEWSRemoteAccountMailServiceRequest!): UpdateRemoteAccountResponse!,
 
-	# Alters an EWS provider mail service. Use alterEWSRemoteAccountMailService for non-provider accounts.
-	alterEWSProviderRemoteAccountMailService(input: AlterEWSProviderRemoteAccountMailServiceRequest!): UpdateRemoteAccountResponse!,
+	# Updates an EWS provider mail service. Use updateEWSRemoteAccountMailService for non-provider accounts.
+	updateEWSProviderRemoteAccountMailService(input: UpdateEWSProviderRemoteAccountMailServiceRequest!): UpdateRemoteAccountResponse!,
 
-	# Alters an EWS agenda service. This supports provider accounts.
-	alterEWSRemoteAccountAgendaService(input: AlterEWSRemoteAccountAgendaServiceRequest!): UpdateRemoteAccountResponse!,
+	# Updates an EWS agenda service. This supports provider accounts.
+	updateEWSRemoteAccountAgendaService(input: UpdateEWSRemoteAccountAgendaServiceRequest!): UpdateRemoteAccountResponse!,
 
-	# Alters an EWS credentials. This supports provider accounts.
-	alterEWSRemoteAccountCredentials(input: AlterEWSRemoteAccountCredentialsRequest!): UpdateRemoteAccountResponse!,
+	# Updates an EWS credentials. This supports provider accounts.
+	updateEWSRemoteAccountCredentials(input: UpdateEWSRemoteAccountCredentialsRequest!): UpdateRemoteAccountResponse!,
 
-	# Alters an EWS host. This does not support provider accounts.
-	alterEWSRemoteAccountHost(input: AlterEWSRemoteAccountHostRequest!): UpdateRemoteAccountResponse!,
+	# Updates an EWS host. This does not support provider accounts.
+	updateEWSRemoteAccountHost(input: UpdateEWSRemoteAccountHostRequest!): UpdateRemoteAccountResponse!,
 
-	# Alters a Google remote account credentials.
-	alterGoogleRemoteAccountCredentials(input: AlterGoogleRemoteAccountCredentialsRequest!): UpdateRemoteAccountResponse!,
+	# Updates a Google remote account credentials.
+	updateGoogleRemoteAccountCredentials(input: UpdateGoogleRemoteAccountCredentialsRequest!): UpdateRemoteAccountResponse!,
 
-	# Alters a Getmail IMAP credentials.
-	alterGetmailRemoteAccountImapCredentials(input: AlterGetmailRemoteAccountImapCredentialsRequest!): UpdateRemoteAccountResponse!,
+	# Updates a Getmail IMAP credentials.
+	updateGetmailRemoteAccountImapCredentials(input: UpdateGetmailRemoteAccountImapCredentialsRequest!): UpdateRemoteAccountResponse!,
 
-	# Alters a Getmail SMTP credentials.
-	alterGetmailRemoteAccountSmtpCredentials(input: AlterGetmailRemoteAccountSmtpCredentialsRequest!): UpdateRemoteAccountResponse!,
+	# Updates a Getmail SMTP credentials.
+	updateGetmailRemoteAccountSmtpCredentials(input: UpdateGetmailRemoteAccountSmtpCredentialsRequest!): UpdateRemoteAccountResponse!,
 
-	# Alters any remote account base information.
-	alterRemoteAccountBaseInfo(input: AlterRemoteAccountBaseInfoRequest!): UpdateRemoteAccountResponse!,
+	# Updates any remote account base information.
+	updateRemoteAccountBaseInfo(input: UpdateRemoteAccountBaseInfoRequest!): UpdateRemoteAccountResponse!,
 
 	# Sets a remote account as the main account for its owner.
-	setMainRemoteAccount(input: SetMainRemoteAccountInput!): UpdateRemoteAccountResponse!,
+	setMainRemoteAccount(input: SetMainRemoteAccountRequest!): UpdateRemoteAccountResponse!,
 
 	# Sets the sort value for one or many accounts for a user.  All accounts must belong to the same user. Returns the final sort values for all user accounts.
-	sortRemoteAccounts(input: SortRemoteAccountsInput!): SortRemoteAccountsResponse!
+	sortRemoteAccounts(input: SortRemoteAccountsRequest!): SortRemoteAccountsResponse!
 }
