@@ -213,6 +213,17 @@ input AlterRemoteAccountCredentialsInput {
 	userPassword: String
 }
 
+input AlterGetmailServiceInput {
+	# True if the Getmail service should remotely delete mails.
+	remoteDelete: Boolean,
+
+	# Time in days before Getmail deletes mail remotely.
+	remoteDeleteAfter: Int,
+
+	# True if Getmail should also attempt to block spam.
+	filterSpam: Boolean
+}
+
 input CreateRemoteAccountHostInput {
 	# Hostname
 	host: String!,
@@ -346,6 +357,17 @@ input CreateGetmailSmtpAccountInput {
 	smtpCredentials: CreateRemoteAccountCredentialsInput!
 }
 
+input CreateGetmailServiceInput {
+	# True if the Getmail service should remotely delete mails.
+	remoteDelete: Boolean!,
+
+	# Time in days before Getmail deletes mail remotely.
+	remoteDeleteAfter: Int!,
+
+	# True if Getmail should also attempt to block spam.
+	filterSpam: Boolean!
+}
+
 input CreateGoogleRemoteAccountRequest {
 	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
@@ -418,6 +440,9 @@ input CreateGetmailRemoteAccountRequest {
 
 	# SMTP account data. Unset if null.
 	smtpAccount: CreateGetmailSmtpAccountInput # ToDo: Check. If null, legacy Getmail will be used instead.
+
+	# Getmail service input data.
+	getmailService: CreateGetmailServiceInput!
 }
 
 input DeleteRemoteAccountRequest {
@@ -531,6 +556,17 @@ input AlterGetmailRemoteAccountSmtpCredentialsRequest {
 
 	# SMTP credentials for the Getmail account to set.
 	smtpCredentials: AlterRemoteAccountCredentialsInput!
+}
+
+input AlterGetmailRemoteAccountServiceRequest {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
+	clientMutationId: String,
+
+	# Affected remote account ID.
+	remoteAccountId: ID!,
+
+	# Getmail service to set for the remote account. 
+	getmailService: AlterGetmailServiceInput!
 }
 
 input AlterRemoteAccountBaseInfoRequest {
