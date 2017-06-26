@@ -10,7 +10,7 @@ enum RemoteAccountType {
 
 enum GetmailAccountType {
 	POP3,
-	POP3SSl,
+	POP3SSL,
 	IMAP,
 	IMAPSSL
 }
@@ -21,326 +21,526 @@ enum SmtpEncryptionTypes {
 	SSL
 }
 
-
+# ToDo: Reimplemented, remove on merge.
 interface Node {
 	id: ID!
 }
 
 type User implements Node {
-	id: ID!,
+	id: ID!
 }
 
 type RemoteAccount implements Node {
 	id: ID!,
-	type: RemoteAccountType!
+
+	# Remote account type.
+	type: RemoteAccountType!,
+
+	# Description provided for the remote account.
 	description: String,
-	isMain: Boolean,
+
+	# True if the remote account is currently the main one.
+	isMain: Boolean!,
+
+	# Sort order priority of the remote account. Accounts are displayed in ascending order.
 	priority: Int,
 
-	# EWS or Gmail API Host
+	# EWS or GMail API Host.
 	host: String,
+
+	# Email attributed to the remote account.
 	email: String,
+
+	# User login for the remote account.
 	userLogin: String,
+
+	# Display name for the remote account.
 	userDisplayName: String,
+
+	# Contact account linked to this remote account.
 	contactAccount: ContactAccount!,
+
+	# Agenda account linked to this remote account.
 	agendaAccount: AgendaAccount!,
+
+	# Mail account linked to this remote account.
 	mailAccount: MailAccount!,
+
+	# Webuser owner of this remote account.
 	owner: User
 }
 
 type AgendaAccount {
+	# True if the agenda account is enabled.
 	enabled: Boolean!,
-	invitationEnabled: Boolean
+
+	# True if invitations management is enabled.
+	invitationEnabled: Boolean!
 }
 
 type ContactAccount {
+	# True if the contact account is enabled.
 	enabled: Boolean!,
-	syncAddresses: Boolean,
-	syncEmails: Boolean,
-	syncPhones: Boolean,
+
+	# True if the contact addresses are to be synced with the local CRM data.
+	syncAddresses: Boolean!,
+
+	# True if the contact emails are to be synced with the local CRM data.
+	syncEmails: Boolean!,
+
+	# True if the contact phones are to be synced with the local CRM data.
+	syncPhones: Boolean!
 }
 
 type MailAccount {
-	enabled: Boolean,
+	# True if the mail account is enabled.
+	enabled: Boolean!,
 
 	# INCOMING
 
-	# Remote imap mail account
+	# Remote IMAP mail account.
 	imap: ImapAccount,
 
-	# Deprecated getmail/pop3 account informations
+	# Deprecated Getmail/POP3 account informations.
 	getmail: GetmailAccount,
 
 	# OUTGOING
 
+	# Email used as the source when sending emails.
 	replyTo: String,
-	# Custom smtp parameters
+
+	# SMTP account parameters.
 	smtp: SmtpAccount,
-	# Deprecated
-	hasSpf: Boolean,
+
+	# True if the SPF record is valid.
+	hasSpf: Boolean!
 }
 
 type ImapAccount {
-	host: String,
-	port: Int,
-	isSsl: Boolean,
-	userLogin: String,
+	# IMAP server host.
+	host: String!,
+
+	# IMAP server port.
+	port: Int!,
+
+	# True if SSL is required by the IMAP server.
+	isSsl: Boolean!,
+
+	# Username for connecting to the IMAP server.
+	userLogin: String!
 }
 
 type GetmailAccount {
-	enabled: Boolean,
-	type: GetmailAccountType,
-	host: String,
-	port: Int,
-	userLogin: String,
-	remoteDelete: Boolean,
+	# True if the Getmail account is enabled.
+	enabled: Boolean!,
+
+	# Type of Getmail account.
+	type: GetmailAccountType!,
+
+	# Getmail server host.
+	host: String!,
+
+	# Getmail server port.
+	port: Int!,
+
+	# Username for connecting to the Getmail server.
+	userLogin: String!,
+
+	# True if mails are to be automatically cleaned up every X days.
+	remoteDelete: Boolean!,
+
+	# Days before an email is deleted remotely. This feature is only active if remoteDelete is true.
 	remoteDeleteAfter: Int,
-	filterSpam: Boolean,
+
+	# True if spam is to be filtered by the Getmail server, as well as the remote server.
+	filterSpam: Boolean!
 }
 
 type SmtpAccount {
+	# SMTP server host.
 	host: String!,
-	port: Int,
-	userLogin: String,
-	encryptionType: SmtpEncryptionTypes,
+
+	# SMTP server port.
+	port: Int!,
+
+	# Username for connecting to the SMTP server.
+	userLogin: String!,
+
+	# Encryption method required by the SMTP server.
+	encryptionType: SmtpEncryptionTypes!
 }
 
 input RemoteAccountsFilters {
-	# User ID
-	ownerId: ID,
+	# Specific webuser owner ID to filter by.
+	ownerId: ID
 }
 
 
 input CreateRemoteAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
-	type: RemoteAccountType!
-	host: String!,
+
+	# Remote account type.
+	type: RemoteAccountType!,
+
+	# EWS or GMail API Host.
+	host: String,
+
+	# Email attributed to the remote account.
 	email: String!,
+
+	# Display name for the remote account.
 	userDisplayName: String!,
-	credentials: AccountCredentialsInput,
-	# If not provided, description is generated
+
+	# Credentials used for the remote account.
+	credentials: MixedAccountCredentialsInput!,
+
+	# If not provided the description will be automatically generated from the remote account type and email.
 	description: String,
-	ownerId: ID!,
+
+	# Webuser owner ID of this remote account.
+	ownerId: ID!
 }
 
-type CreateRemoteAccountPayload {
+type CreateRemoteAccountResponse {
+	# Mutation ID initially provided to the input mutation, or null if not provided.
 	clientMutationId: String,
-	remoteAccount: RemoteAccount,
+
+	# Newly created remote account.
+	remoteAccount: RemoteAccount!
 }
 
 input UpdateRemoteAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
-	host: String!,
-	email: String!,
-	userLogin: String!,
+
+	# EWS or GMail API Host.
+	host: String,
+
+	# Email attributed to the remote account.
+	email: String,
+
+	# Display name for the remote account.
 	userDisplayName: String!,
-	description: String,
+
+	# Description for the remote account.
+	description: String
 }
 
-type UpdateRemoteAccountPayload {
+type UpdateRemoteAccountResponse {
+	# Mutation ID initially provided to the input mutation, or null if not provided.
 	clientMutationId: String,
-	remoteAccountId: ID!,
+
+	# Updated remount account.
+	remoteAccount: RemoteAccount!
 }
 
 input UpdateRemoteAccountCredentialsInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
+
+	# Affected remote account ID.
 	remoteAccountId: ID!,
-	credentials: AccountCredentialsInput,
+	credentials: AccountCredentialsInput
 }
 
 input ContactAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
+
+	# Affected remote account ID.
 	remoteAccountId: ID!,
+
+	# True if the contact addresses are to be synced with the local CRM data.
 	syncAddresses: Boolean,
+
+	# True if the contact emails are to be synced with the local CRM data.
 	syncEmails: Boolean,
-	syncPhones: Boolean,
+
+	# True if the contact phones are to be synced with the local CRM data.
+	syncPhones: Boolean
 }
 
 input AgendaAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
+
+	# Affected remote account ID.
 	remoteAccountId: ID!,
-	invitationEnabled: Boolean,
+
+	# True if invitations management is enabled.
+	invitationEnabled: Boolean
 }
 
 input EnableImapMailAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
+
+	# Affected remote account ID.
 	remoteAccountId: ID!,
+
+	# IMAP account data.
 	imap: ImapAccountInput,
+
+	# Email used as the source when sending emails.
 	replyTo: String,
-	smtp: SmtpAccountInput,
+
+	# ToDo: Truncate.
+	# SMTP account data.
+	smtp: SmtpAccountInput
 }
 
 input EnableGetmailMailAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
+
+	# Affected remote account ID.
 	remoteAccountId: ID!,
+
+	# Getmail account data.
 	getmail: GetmailAccountInput,
-	replyTo: String,
-	smtp: SmtpAccountInput,
+
+	# ToDo: Truncate.
+	# SMTP account data.
+	smtp: SmtpAccountInput
 }
 
 
 input UpdateImapMailAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
+
+	# Affected remote account ID.
 	remoteAccountId: ID!,
-	imap: ImapAccountInput!,
-	replyTo: String,
+
+	# IMAP account data.
+	imap: ImapAccountInput!
 }
 
 input UpdateGetmailMailAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
+
+	# Affected remote account ID.
 	remoteAccountId: ID!,
+
+	# Getmail account data.
 	getmail: GetmailAccountInput!,
-	replyTo: String,
+
+	# Email used as the source when sending emails.
+	replyTo: String
 }
 
 input UpdateMailAccountSmtpInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
+
+	# Affected remote account ID.
 	remoteAccountId: ID!,
-	smtp: SmtpAccountInput!,
+
+	# SMTP account data.
+	smtp: SmtpAccountInput!
 }
 
-input AccountCredentialsInput {
+input MixedAccountCredentialsInput {
+	# Login username to set.
 	userLogin: String!,
+
+	# Login password to set.
 	userPassword: String,
-	oauth2RefreshToken: String,
+
+	# OAuth refresh token to set.
+	oauth2RefreshToken: String
+}
+
+input UserPassAccountCredentialsInput {
+	# Login username to set.
+	userLogin: String!,
+
+	# Login password to set.
+	userPassword: String
 }
 
 input SmtpAccountInput {
+	# SMTP server host.
 	host: String!,
+
+	# SMTP server port. At creation, by default, sets itself to the specified encryption ports. None is 25, SSL is 465, and TLS is 587.
 	port: Int,
-	user: String,
-	encryption: SmtpEncryptionTypes,
+
+	# Encryption method required by the SMTP server.
+	encryption: SmtpEncryptionTypes!
 }
 
 input ImapAccountInput {
+	# SMTP server host.
 	host: String!,
+
+	# SMTP server port. Without SSL, defaults to 25; with SSL, defaults to 587.
 	port: Int,
+
+	# True if SSL is required by the SMTP server. Defaults to true.
 	isSsl: Boolean,
-	replyTo: String,
+
+	# Email used as the source when sending emails.
+	replyTo: String
 }
 
 input GetmailAccountInput {
+	# True if Getmail is to be enabled. By default, remains unchanged.
 	enabled: Boolean,
+
+	# Type of Getmail account.
 	type: GetmailAccountType,
+
+	# Getmail server host.
 	host: String,
+
+	# Getmail server port.
 	port: Int,
-	delete: Boolean,
-	deleteAfter: Int,
-	filterSpam: Boolean,
+
+	# True if mails are to be automatically cleaned up every X days.
+	remoteDelete: Boolean,
+
+	# Days before an email is deleted remotely. This feature is only active if remoteDelete is true.
+	remoteDeleteAfter: Int,
+
+	# True if spam is to be filtered by the Getmail server, as well as the remote server.
+	filterSpam: Boolean
 }
 
 input SetMainRemoteAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
-	remoteAccountId: ID!,
+
+	# Affected remote account ID.
+	remoteAccountId: ID!
 }
 
 input SortRemoteAccountsInput {
-	remoteAccounts: [SortRemoteAccountInput!]!,
+	# List of remote account sort order to set.
+	remoteAccounts: [SortRemoteAccountInput!]!
 }
 
 input SortRemoteAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
+
+	# Affected remote account ID.
 	remoteAccountId: ID!,
-	sortValue: Int,
+
+	# New sort priority to set for the remote account. Accounts are displayed in ascending order.
+	sortValue: Int!
 }
 
-type SortRemoteAccountsPayload {
-	remoteAccounts: [SortRemoteAccountPayload!]!,
-}
-
-type SortRemoteAccountPayload {
+type SortRemoteAccountsResponse {
+	# Mutation ID initially provided to the input mutation, or null if not provided.
 	clientMutationId: String,
-	remoteAccountId: ID!,
-	sortValue: Int,
+
+	# Dataset of all remote accounts affected by the sorting. All the accounts owned by the sorted remote account owner will be returned.
+	remoteAccounts: [RemoteAccount!]!
 }
 
 input DeleteRemoteAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
-	remoteAccountId: ID!,
+
+	# Affected remote account ID.
+	remoteAccountId: ID!
 }
 
 input DisableContactAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
-	remoteAccountId: ID!,
+
+	# Affected remote account ID.
+	remoteAccountId: ID!
 }
 
 input DisableAgendaAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
-	remoteAccountId: ID!,
+
+	# Affected remote account ID.
+	remoteAccountId: ID!
 }
 
 input DisableMailAccountInput {
+	# Local mutation ID to aid with synchronization. This is unused by the server and will be sent back as is when the query is complete.
 	clientMutationId: String,
-	remoteAccountId: ID!,
+
+	# Affected remote account ID.
+	remoteAccountId: ID!
 }
 
 
 type Query {
-	# Requests a single node
-	node(id: ID!): Node
+	# ToDo: Reimplemented, remove on merge.
+	# Requests a single node.
+	node(id: ID!): Node,
 
-	remoteAccounts(filters: RemoteAccountsFilters): RemoteAccount,
+	# ToDo: Extend to Node/Edge.
+	# Requests multiple remote accounts.
+	remoteAccounts(filters: RemoteAccountsFilters): [RemoteAccount!]!
 
 }
 
 type Mutation {
+	# Creates a new remote account.
+	createRemoteAccount(input: CreateRemoteAccountInput!): CreateRemoteAccountResponse,
 
-	# Create a new remote account
-	createRemoteAccount(input: CreateRemoteAccountInput!): CreateRemoteAccountPayload,
+	# Updates remote account global fields.
+	updateRemoteAccount(input: UpdateRemoteAccountInput!): UpdateRemoteAccountResponse,
 
-	# Update remote account global fields
-	updateRemoteAccount(input: UpdateRemoteAccountInput!): UpdateRemoteAccountPayload,
+	# Sets the global login and password for the remote account.
+	updateRemoteAccountCredentials(input: MixedAccountCredentialsInput!): UpdateRemoteAccountResponse,
 
-	# Set the global login and password for the remote account
-	updateRemoteAccountCredentials(input: UpdateRemoteAccountCredentialsInput!): UpdateRemoteAccountPayload,
+	# Deletes a remote account.
+	deleteRemoteAccount(input: DeleteRemoteAccountInput!): UpdateRemoteAccountResponse,
 
-	# Delete a remote account
-	deleteRemoteAccount(input: DeleteRemoteAccountInput!): UpdateRemoteAccountPayload,
+	# Enables contact integration for a remote account.
+	enableContactAccount(input: ContactAccountInput!): UpdateRemoteAccountResponse,
 
-	# Enable contact integration for a remote account
-	enableContactAccount(input: ContactAccountInput!): UpdateRemoteAccountPayload,
+	# Updates contact parameters for a remote account.
+	updateContactAccount(input: ContactAccountInput!): UpdateRemoteAccountResponse,
 
-	# Update contact parameters for a remote account
-	updateContactAccount(input: ContactAccountInput!): UpdateRemoteAccountPayload,
+	# Disables contact integration for a remote account.
+	disableContactAccount(input: DisableContactAccountInput!): UpdateRemoteAccountResponse,
 
-	# Disable contact integration for a remote account
-	disableContactAccount(input: DisableContactAccountInput!): UpdateRemoteAccountPayload,
+	# Enables agenda/calendar integration for a remote account.
+	enableAgendaAccount(input: AgendaAccountInput!): UpdateRemoteAccountResponse,
 
-	# Enable agenda/calendar integration for a remote account
-	enableAgendaAccount(input: AgendaAccountInput!): UpdateRemoteAccountPayload,
+	# Updates agenda/calendar parameters for a remote account.
+	updateAgendaAccount(input: AgendaAccountInput!): UpdateRemoteAccountResponse,
 
-	# Update agenda/calendar parameters for a remote account
-	updateAgendaAccount(input: AgendaAccountInput!): UpdateRemoteAccountPayload,
+	# Disables agenda/calendar integration for a remote account.
+	disableAgendaAccount(input: DisableAgendaAccountInput!): UpdateRemoteAccountResponse,
 
-	# Disable agenda/calendar integration for a remote account
-	disableAgendaAccount(input: DisableAgendaAccountInput!): UpdateRemoteAccountPayload,
+	# Enables an IMAP based mail account for the remote account. Use with GOOGLE, EXCHANGE, OFFICE365 and OUTLOOK accounts.
+	enableImapMailAccount(input: EnableImapMailAccountInput!): UpdateRemoteAccountResponse,
 
-	# Enable a IMAP based mail account for the remote account. Use with GOOGLE, EXCHANGE, OFFICE365 and OUTLOOK accounts
-	enableImapMailAccount(input: EnableImapMailAccountInput!): UpdateRemoteAccountPayload,
+	# Updates IMAP based mail account parameters for the remote account.
+	updateImapMailAccount(input: UpdateImapMailAccountInput!): UpdateRemoteAccountResponse,
 
-	# Update IMAP based mail account parameters for remote account
-	updateImapMailAccount(input: UpdateImapMailAccountInput!): UpdateRemoteAccountPayload,
+	# Enables a Getmail/POP3 based mail account for the remote account. Use with GETMAIL accounts
+	enableGetmailMailAccount(input: EnableGetmailMailAccountInput!): UpdateRemoteAccountResponse,
 
-	# Enable a Getmail/POP3 based mail account for the remote account. Use with GETMAIL accounts
-	enableGetmailMailAccount(input: EnableGetmailMailAccountInput!): UpdateRemoteAccountPayload,
+	# Updates Getmail/POP3 based mail account parameters for the remote account.
+	updateGetmailMailAccount(input: UpdateGetmailMailAccountInput!): UpdateRemoteAccountResponse,
 
-	# Update Getmail/POP3 based mail account parameters for remote account
-	updateGetmailMailAccount(input: UpdateGetmailMailAccountInput!): UpdateRemoteAccountPayload,
+	# Sets or updates custom SMTP parameters for a remote account.
+	updateMailAccountSmtp(input: UpdateMailAccountSmtpInput!): UpdateRemoteAccountResponse,
 
-	# Set or update custom smtp parameters for a remote account
-	updateMailAccountSmtp(input: UpdateMailAccountSmtpInput!): UpdateRemoteAccountPayload,
+	# Updates custom SMTP login and password for a remote account.
+	updateMailAccountSmtpCredentials(input: UserPassAccountCredentialsInput!): UpdateRemoteAccountResponse,
 
-	# Update custom smtp login and password for a remote acount
-	updateMailAccountSmtpCredentials(input: UpdateRemoteAccountCredentialsInput!): UpdateRemoteAccountPayload,
+	# Disables mail integration for a remote account.
+	disableMailAccount(input: DisableMailAccountInput!): UpdateRemoteAccountResponse,
 
-	# Disable mail integration for a remote account
-	disableMailAccount(input: DisableMailAccountInput!): UpdateRemoteAccountPayload,
+	# Sets a remote account as the main account for its owner.
+	setMainRemoteAccount(input: SetMainRemoteAccountInput!): UpdateRemoteAccountResponse,
 
-	# Set a remote accont as the main account for it's owner
-	setMainRemoteAccount(input: SetMainRemoteAccountInput!): UpdateRemoteAccountPayload,
-
-	# Set the sort value for one or many accounts for a user.  All accounts must belong to the same user.
-	# Returns the final sort values for all user accounts
-	sortRemoteAccounts(input: SortRemoteAccountsInput!): SortRemoteAccountsPayload,
+	# Sets the sort value for one or many accounts for a user.  All accounts must belong to the same user. Returns the final sort values for all user accounts.
+	sortRemoteAccounts(input: SortRemoteAccountsInput!): SortRemoteAccountsResponse
 
 }
