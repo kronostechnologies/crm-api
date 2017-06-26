@@ -9,6 +9,13 @@ enum SmtpEncryptionTypes {
 	SSL
 }
 
+enum GetmailAccountType {
+	POP3,
+	POP3SSl,
+	IMAP,
+	IMAPSSL
+}
+
 
 #
 # --- QUERY
@@ -43,6 +50,23 @@ type RemoteAccountHost {
 	port: Int!
 }
 
+type GetmailService {
+	# True if Getmail is enabled for the mail account.
+	enabled: Boolean!,
+
+	# Getmail account type.
+	type: GetmailAccountType,
+
+	# True if Getmail deletes mail remotely.
+	remoteDelete: Boolean,
+
+	# Time in days before Getmail deletes mail remotely.
+	remoteDeleteAfter: Int,
+
+	# True if Getmail also acts as a spam filter.
+	filterSpam: Boolean,
+}
+
 # Mail service information. It does not contain passwords for security reasons.
 type MailService {
 	# True if the mail account is enabled.
@@ -62,6 +86,9 @@ type MailService {
 
 	# SMTP encryption. Can be null.
 	smtpEncryption: SmtpEncryptionTypes,
+
+	# Getmail service status for the mail account.
+	getmailService: GetmailService!,
 
 	# True if the SPF record is valid.
 	hasSpf: Boolean!
