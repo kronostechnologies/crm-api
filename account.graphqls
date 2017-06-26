@@ -245,21 +245,21 @@ input UpdateRemoteAccountHostInput {
 # --- REMOTE ACCOUNT CREATION
 input ContactServiceInput {
 	# True if the contact service is to be enabled.
-	enabled: bool!,
+	enabled: Boolean!,
 
 	# True if the contact addresses are to be synced with the local CRM data. Defaults to true.
-	syncAddresses: bool,
+	syncAddresses: Boolean,
 
 	# True if the contact addresses are to be synced with the local CRM data. Defaults to true.
-	syncEmails: bool,
+	syncEmails: Boolean,
 
 	# True if the contact addresses are to be synced with the local CRM data. Defaults to true.
-	syncPhones: bool
+	syncPhones: Boolean
 }
 
 input CreateEWSMailServiceInput {
 	# True if the mail service is to be enabled.
-	enabled: bool!,
+	enabled: Boolean!,
 
 	# IMAP credentials data.
 	imapCredentials: CreateRemoteAccountCredentialsInput!,
@@ -271,7 +271,7 @@ input CreateEWSMailServiceInput {
 
 input UpdateEWSMailServiceInput {
 	# True if the mail service is to be enabled.
-	enabled: bool!,
+	enabled: Boolean!,
 
 	# IMAP credentials data.
 	imapCredentials: UpdateRemoteAccountCredentialsInput,
@@ -283,7 +283,7 @@ input UpdateEWSMailServiceInput {
 
 input CreateEWSProviderMailServiceInput {
 	# True if the mail service is to be enabled for this mail account.
-	enabled: bool!,
+	enabled: Boolean!,
 
 	# IMAP credentials data.
 	imapCredentials: CreateRemoteAccountCredentialsInput!
@@ -292,7 +292,7 @@ input CreateEWSProviderMailServiceInput {
 
 input UpdateEWSProviderMailServiceInput {
 	# True if the mail service is to be enabled.
-	enabled: bool!,
+	enabled: Boolean!,
 
 	# IMAP credentials data.
 	imapCredentials: UpdateRemoteAccountCredentialsInput
@@ -304,7 +304,7 @@ input CreateRemoteAccountBaseInfoInput {
 	priority: Int,
 
 	# Is main account. Defaults to false, but will be set to true if no other account is able to be a main account but this one can.
-	main: bool,
+	main: Boolean,
 
 	# Display name for the remote account.
 	userDisplayName: String!,
@@ -325,7 +325,7 @@ input UpdateRemoteAccountBaseInfoInput {
 	priority: Int,
 
 	# Is main account. Defaults to false, but will be set to true if no other account is able to be a main account but this one can.
-	main: bool,
+	main: Boolean,
 
 	# Display name for the remote account.
 	userDisplayName: String,
@@ -343,10 +343,10 @@ input UpdateRemoteAccountBaseInfoInput {
 
 input AgendaServiceInput {
 	# True is the agenda service is to be enabled.
-	enabled: bool!,
+	enabled: Boolean!,
 
 	# Defaults to true.
-	invitationEnabled: bool
+	invitationEnabled: Boolean
 }
 
 input CreateGetmailSmtpAccountInput {
@@ -617,7 +617,7 @@ type DeleteRemoteAccountResponse {
 	clientMutationId: String,
 
 	# True if account deletion succeeded.
-	success: bool!
+	success: Boolean!
 }
 
 type SortRemoteAccountsResponse {
