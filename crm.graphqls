@@ -205,6 +205,15 @@ type Job implements Node {
 	employer: String
 }
 
+# BaseJob mutation entity.
+input BaseJob {
+	# Name of the job.
+	occupation: String,
+
+	# Employer name.
+	employer: String
+}
+
 # Address entity.
 type Address implements Node {
 	# Unique numerical identifier of the address.
@@ -805,4 +814,19 @@ type Query {
 
 	# Labels for specific group.
 	fieldValues(type: FieldValueType): [FieldValue!]
+}
+
+# Mutation types
+type Mutation {
+	# Creates a new Job.
+	createJob(mutationId: String!): Boolean!,
+
+	# Selects job for update.
+	selectJob(mutationId: String!, id: ID!): Boolean!,
+
+	# Deletes job.
+	deleteJob(mutationId: String!, id: ID!): Boolean!,
+
+	# Updates job attributes from the selected job.
+	setJob(mutationId: String!, job: BaseJob!): Job!
 }
