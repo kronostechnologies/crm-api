@@ -211,7 +211,10 @@ input BaseJob {
 	occupation: String,
 
 	# Employer name.
-	employer: String
+	employer: String,
+
+	# Identifier of the parent contact
+	parentContactId: ID
 }
 
 # Address entity.
@@ -819,14 +822,11 @@ type Query {
 # Mutation types
 type Mutation {
 	# Creates a new Job.
-	createJob(mutationId: String!): Boolean!,
+	createJob(job: BaseJob!): Job!,
 
-	# Selects job for update.
-	selectJob(mutationId: String!, id: ID!): Boolean!,
+	# Updates job.
+	updateJob(id: ID!, job: BaseJob!): Job!,
 
 	# Deletes job.
-	deleteJob(mutationId: String!, id: ID!): Boolean!,
-
-	# Updates job attributes from the selected job.
-	setJob(mutationId: String!, job: BaseJob!): Job!
+	deleteJob(id: ID!): Boolean!
 }
