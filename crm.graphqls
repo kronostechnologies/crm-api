@@ -112,6 +112,16 @@ enum FieldValueType {
 	EMAIL_TYPE
 }
 
+# Available contact segments.
+enum ContactSegment {
+    SEGMENT_1,
+    SEGMENT_2,
+    SEGMENT_3,
+    SEGMENT_4,
+    SEGMENT_5,
+    SEGMENT_6
+}
+
 # Frequency
 enum InterestCompoundFrequency {
 	WEEKLY,
@@ -217,10 +227,7 @@ input BaseJob {
 	occupation: String,
 
 	# Employer name.
-	employer: String,
-
-	# Identifier of the parent contact
-	parentContactId: ID
+	employer: String
 }
 
 # Address entity.
@@ -243,6 +250,43 @@ type Address implements Node {
 
 	# Translated type of the address.
 	type: FieldValue!,
+
+	# First line of the address.
+	line1: String!,
+
+	# Second line of the address.
+	line2: String,
+
+	# State or province of the address.
+	stateProvince: String,
+
+	# Country of the address.
+	country: String,
+
+	# Postal/zip code of the address.
+	postalCode: String,
+
+	# Date which the address became active.
+	dateSince: Date,
+
+	# City of the address.
+	city: String
+}
+
+# Address entity for inputs.
+input BaseAddress {
+	# True if this is considered as a main address.
+	main: Boolean!,
+
+	# API DEV: If postal is null, assume it is not a postal address
+
+	# True if this is considered as a postal address.
+	postal: Boolean!,
+
+	# API DEV: Is a vdvalue
+
+	# Translated type of the address.
+	type: ID!,
 
 	# First line of the address.
 	line1: String!,
@@ -296,6 +340,27 @@ type Phone implements Node {
 	extension: String
 }
 
+# Representation of a phone entity used for inputting new phone numbers.
+input BasePhone {
+	# True if this is considered a main phone number.
+	main: Boolean!,
+
+	# Type of the phone number.
+	type: ID,
+
+	# Actual phone number. The extension is included in it.
+	number: String!,
+
+	# True if the phone number number is considered long distance.
+	longDistance: Boolean,
+
+	# Notes of the phone number.
+	notes: String,
+
+	# Phone number's extension.
+	extension: String
+}
+
 # Representation of an email entity
 type Email implements Node {
 	# Unique identifier of the email.
@@ -310,6 +375,20 @@ type Email implements Node {
 
 	# Type of the email address.
 	type: FieldValue!,
+
+	# Actual email address.
+	email: String!,
+
+	# Notes of the email address.
+	notes: String
+}
+
+input BaseEmail {
+    # True if this is considered a main email address.
+    main: Boolean!,
+
+	# Type of the email address.
+	type: ID,
 
 	# Actual email address.
 	email: String!,
@@ -472,13 +551,8 @@ type IndividualContact implements Node, Contact {
 	# API DEV: In marital_status table, must do a TOP 1 query to fetch it, and it can be NULL
 	# API DEV: civilStatus is in vdvalues (vd_marital_status)
 
-	# Translated civil status of the contact.
-	civilStatus: FieldValue,
-
-	# API DEV: civilStatusSince is date_start of marital_status
-
-	# Date since the current civil status is active.
-	civilStatusSince: Date,
+	# Latest civil status of the contact.
+	civilStatus: CivilStatus,
 
 	# API DEV: 1-1 relationship with job table from contacts
 
@@ -582,6 +656,58 @@ type IndividualContact implements Node, Contact {
 
 	# Calculated initials of the contact.
 	initials: String
+}
+
+# Defines a basic individual contact.
+input BaseIndividualContact {
+    # First name of the contact.
+    firstName: String!,
+
+    # Last name of the contact.
+    lastName: String!,
+
+    # Middle name of the contact.
+    middleName: String,
+
+    # True if contact is a smoker.
+    smoker: Boolean,
+
+    # Date when smoker status ended.
+    smokerEndDate: Date,
+
+    # Gender.
+    gender: Gender,
+
+    # Birthdate.
+    birthDate: Date,
+
+    # Client number.
+    clientNb: String
+}
+
+type CivilStatus {
+    # Civil status ID.
+    id: ID!,
+
+    # Date when the civil status starts.
+    startDate: Date,
+
+    # Date when the civil status ends.
+    endDate: Date,
+
+    # Civil status value.
+    status: FieldValue!
+}
+
+input BaseCivilStatus {
+    # Date when the civil status starts.
+    startDate: Date,
+
+    # Date when the civil status ends.
+    endDate: Date,
+
+    # Civil status value.
+    status: FieldValue!
 }
 
 # Defines a contact edge (entry), used for pagination.
@@ -940,6 +1066,14 @@ type Website implements Node {
 	main: Boolean!
 }
 
+input BaseWebsite {
+	# Website's URL.
+	url: String!,
+
+	# True if the website is the main one specified.
+	main: Boolean!
+}
+
 # Inputs
 input ActivityListFilters {
 	# The activities need to be contained in the specified activity types in order to be displayed. This filter is mandatory.
@@ -993,6 +1127,7 @@ type Query {
 
 # Mutation types
 type Mutation {
+    # ToDo: Remove job create, update, delete when the samples are no longer necessary.
 	# Creates a new Job.
 	createJob(job: BaseJob!): Job!,
 
@@ -1000,5 +1135,80 @@ type Mutation {
 	updateJob(id: ID!, job: BaseJob!): Job!,
 
 	# Deletes job.
-	deleteJob(id: ID!): Boolean!
+	deleteJob(id: ID!): Boolean!,
+
+	# Creates a new individual contact.
+	addIndividualContact(contact: BaseIndividualContact!): IndividualContact,
+
+	# Updates an individual contact base info.
+	updateIndividualContact(contactId: ID!, contact: BaseIndividualContact!): IndividualContact,
+
+	# Deletes an individual contact.
+	deleteIndividualContact(contactId: ID!): Boolean!,
+
+	# Sets an individual contact civil status.
+    addIndividualContactCivilStatus(contactId: ID!, civilStatusId: ID, since: Date): IndividualContact,
+
+    # Deletes an individual contact civil status.
+    deleteIndividualContactCivilStatus(contactId: ID!, civilStatusId: ID): IndividualContact,
+
+    # Adds an individual contact job.
+    addIndividualContactJob(contactId: ID!, job: BaseJob!): IndividualContact,
+
+    # Deletes an individual contact job.
+    deleteIndividualContactJob(contactId: ID!, jobId: ID!): IndividualContact,
+
+    # Adds an individual contact hobby.
+    addIndividualContactHobby(contactId: ID!, hobbyId: ID!): IndividualContact,
+
+    # Deletes an individual contact hobby.
+    deleteIndividualContactHobby(contactId: ID!, hobbyId: ID!): IndividualContact,
+
+    # Sets a contact segment.
+	setContactSegment(contactId: ID!, segment: ContactSegment!, segmentId: ID): Contact,
+
+    # Sets a contact territory.
+    setContactTerritory(contactId: ID!, territoryId: ID!): Contact,
+
+    # Adds a contact category (class).
+    addContactCategory(contactId: ID!, categoryId: ID!): Contact,
+
+    # Deletes a contact category (class).
+    deleteContactCategory(contactId: ID!, categoryId: ID!): Contact,
+
+    # Adds a contact distribution list.
+    addContactDistributionList(contactId: ID!, distributionListId: ID!): Contact,
+
+    # Deletes a contact distribution list.
+    deleteContactDistributionList(contactId: ID!, distributionListId: ID!): Contact,
+
+    # Adds a contact industry.
+    addContactIndustry(contactId: ID!, industryId: ID!): Contact,
+
+    # Deletes a contact industry.
+    deleteContactIndustry(contactId: ID!, industryId: ID!): Contact,
+
+    # Adds an address for the given contact.
+    addContactAddress(contactId: ID!, address: BaseAddress!): Contact,
+
+    # Deletes an address for the given contact.
+    deleteContactAddress(contactId: ID!, addressId: ID!): Contact,
+
+    # Adds a phone number for the given contact.
+    addContactPhone(contactId: ID!, phoneId: BasePhone!): Contact,
+
+    # Deletes a phone number for the given contact.
+    deleteContactPhone(contactId: ID!, phoneId: ID!): Contact,
+
+    # Adds an email for the given contact.
+    addContactEmail(contactId: ID!, email: BaseEmail!): Contact,
+
+    # Deletes an email for the given contact.
+    deleteContactEmail(contactId: ID!, emailId: ID!): Contact,
+
+    # Adds an email for the given contact.
+    addContactWebsite(contactId: ID!, website: BaseWebsite!): Contact,
+
+    # Deletes an email for the given contact.
+    deleteContactWebsite(contactId: ID!, websiteId: ID!): Contact
 }
