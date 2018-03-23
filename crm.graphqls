@@ -15,24 +15,6 @@ scalar Cursor
 
 # Enumerations
 
-# Gender
-enum Gender {
-	MALE,
-	FEMALE
-}
-
-# Language
-enum Language {
-	FRENCH,
-	ENGLISH
-}
-
-# Contact type (actually Form Type in CRM)
-enum ContactType {
-	CUS,
-	OTHER
-}
-
 # Activity type
 enum ActivityType {
 	CALL,
@@ -44,21 +26,19 @@ enum ActivityType {
 	TASK
 }
 
-# Sort order
-enum SortOrder {
-	# Ascending
-	ASC,
-
-	# Descending
-	DESC
+# Available contact segments.
+enum ContactSegment {
+    SEGMENT_1,
+    SEGMENT_2,
+    SEGMENT_3,
+    SEGMENT_4,
+    SEGMENT_5,
+    SEGMENT_6
 }
 
-# Plan account category
-enum PlanAccountCategory {
-	MUTUAL_FUND,
-	SEGREGATED_FUND,
-	GIC,
-	SHARE,
+# Contact type (actually Form Type in CRM)
+enum ContactType {
+	CUS,
 	OTHER
 }
 
@@ -68,25 +48,6 @@ enum Currency {
 	USD,
 	EUR,
 	GBP
-}
-
-# Payment mode
-enum PaymentMode {
-	ANNUAL,
-	BIMNTHL,
-	WKLY,
-	MNTHLY,
-	SINGLEPA,
-	BIWKLY,
-	DAILY,
-	BIANNUAL,
-	QUARTLY
-}
-
-# Insurance coverage type
-enum InsuranceCoverageType {
-	COVERAGE,
-	RIDER
 }
 
 # Field value type
@@ -112,14 +73,16 @@ enum FieldValueType {
 	EMAIL_TYPE
 }
 
-# Available contact segments.
-enum ContactSegment {
-    SEGMENT_1,
-    SEGMENT_2,
-    SEGMENT_3,
-    SEGMENT_4,
-    SEGMENT_5,
-    SEGMENT_6
+# Gender
+enum Gender {
+	MALE,
+	FEMALE
+}
+
+# Insurance coverage type
+enum InsuranceCoverageType {
+	COVERAGE,
+	RIDER
 }
 
 # Frequency
@@ -146,6 +109,45 @@ enum InterestInstallmentMode {
 	YEARLY,
 	DAILY
 }
+
+# Language
+enum Language {
+	FRENCH,
+	ENGLISH
+}
+
+# Payment mode
+enum PaymentMode {
+	ANNUAL,
+	BIMNTHL,
+	WKLY,
+	MNTHLY,
+	SINGLEPA,
+	BIWKLY,
+	DAILY,
+	BIANNUAL,
+	QUARTLY
+}
+
+# Plan account category
+enum PlanAccountCategory {
+	MUTUAL_FUND,
+	SEGREGATED_FUND,
+	GIC,
+	SHARE,
+	OTHER
+}
+
+# Sort order
+enum SortOrder {
+	# Ascending
+	ASC,
+
+	# Descending
+	DESC
+}
+
+
 
 # Interfaces
 
