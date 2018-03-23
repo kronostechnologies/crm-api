@@ -637,6 +637,9 @@ type OrganizationContact implements Node, Contact {
 
 	# Organization abbreviation
 	abbreviation: String
+
+	# Actions of the contact. Can be sorted.
+	actions(first: Int, after: Cursor, from: Cursor, filters: ActionListFilters!): ActionConnection!,
 }
 
 type IndividualContact implements Node, Contact {
@@ -798,6 +801,9 @@ input BaseIndividualContact {
 
     # Client number.
     clientNb: String
+
+	# Actions of the contact. Can be sorted.
+	actions(first: Int, after: Cursor, from: Cursor, filters: ActionListFilters!): ActionConnection!,
 }
 
 type CivilStatus {
@@ -1225,6 +1231,24 @@ input FieldValueFilter {
 	startsWith: String
 }
 
+# Inputs
+input ActionListFilters {
+	# The actions need to be contained in the specified action types in order to be displayed. This filter is mandatory.
+	agendaTypeIn: [ActionActivityType!]!,
+
+	# If specified, filter activity based on completed flag.
+	isCompleted: Boolean,
+
+	# Minimum start date.
+	minStartDate: DateTime,
+
+	# Maximum start date.
+	maxStartDate: DateTime,
+
+	# Sort order (of field sortDate).
+	sortOrder: SortOrder
+}
+
 # Main types
 type Query {
 	# Requests a single node.
@@ -1326,4 +1350,223 @@ type Mutation {
 
     # Deletes an email for the given contact.
     deleteContactWebsite(contactId: ID!, websiteId: ID!): Contact
+}
+
+# Complete representation of an action.
+type Action implements Node {
+	# Unique numerical identifier of the action.
+	id: ID!,
+
+	# True if the activity is considered completed.
+	private: Boolean!,
+
+	# State of the action. TODO or DONE.
+	state: ActionState!,
+
+	# Action form type. TODOR, TODOS or DONE.
+	formType: ActionFormType!,
+
+	# Action activity type. CALL, LETTER, MEETING, VACATION, FILE, NOTE or TASK. default: CALL
+	type: ActionActivityType!,
+
+	# Action vd in out.
+	vdInOut: Int!,
+
+	# Action vd send via.
+	vdSentVia: Int!,
+
+	# Subject of the activity.
+	subject: String,
+
+	# Action priority. PRIORITY_HIGH, PRIORITY_NORMAL_HIGH, PRIORITY_NORMAL, PRIORITY_NORMAL_LOW, PRIORITY_LOW. Default: PRIORITY_NORMAL_HIGH
+	priority: ActionPriority!,
+
+	# Action Location.
+	location: String,
+
+	# Date when the action starts.
+	startDate: Date,
+
+	# Time when the action starts.
+	startTime: Time,
+
+	# Time when the action ends.
+	timeEnd: Time,
+
+	# Action vd alarm unit.
+	vdAlarmUnit: Int!,
+
+	# Date the record was created.
+	dateCreated: Date,
+
+	# Action created by.
+	createdBy: Webuser!,
+
+	# Action modified by.
+	modifiedBy: Webuser!,
+
+	# Action date modified.
+	dateModified: DateTime,
+
+	# Action completed by.
+	completedBy: Webuser!,
+
+	# Action date completed.
+	dateCompleted: DateTime,
+
+	# Action source. CRM or Exchange. Default: CRM
+	source: ActionSource!,
+
+	# Action is visible. Default: Y
+	visible: Bool!,
+
+	# Action end date
+	dateEnd: Date,
+
+	# Action initial date
+	dateInitial: Date,
+
+	# Action start day
+	nbDayStart: Int!,
+
+	# Action start day
+	nbDayEnd: Int!,
+
+	# Action alarm ?
+	alarm: Bool,
+
+	# Action alarm delay.
+	alarmDelay: Int!,
+
+	# Notice done ?
+	noticeDone: Bool,
+
+	# Foreign key to sequence parent.
+	fkSequenceParent: Int!,
+
+	# Action completion status.
+	completionStatus: ActionCompleteStatus,
+
+	# Notice add ?
+	noticeAdd: Bool,
+
+	# Action re recurrence.
+	reRecurrence: ActionReRecurrence!,
+
+	# Re delete ?
+	reDelete: Bool!,
+
+	# Action re day.
+	reDay: ActionDay,
+
+	# Re day number.
+	reDayNumber: Int!,
+
+	# Re monday.
+	reMonday: Bool,
+
+	# Re tuesday.
+	reTuesday: Bool,
+
+	# Re wednesday.
+	reWednesday: Bool,
+
+	# Re thursday.
+	reThursday: Bool,
+
+	# Re friday.
+	reFriday: Bool,
+
+	# Re saturday.
+	reSaturday: Bool,
+
+	# Re sunday.
+	reSunday: Bool,
+
+	# Re week number.
+	reWeekNumber: String,
+
+	# Re day position.
+	reDayPosition: String,
+
+	# Re day type.
+	reDayType: String,
+
+	# Action re mode.
+	reMode: ActionMode,
+
+	# Action re nth when.
+	reNthWhen: ActionReNthWhen,
+
+	# Action re nth day.
+	reNthDay: ActionReNthDay,
+
+	# Re month day number.
+	reMonthDayNumber: String,
+
+	# Re month number.
+	reMonthNumber: String,
+
+	# Re year month day.
+	reYeahMonthDay: String,
+
+	# Action re year month.
+	reYearMonth: ActionReYearMonth,
+
+	# Re duration type.
+	reDurationType: String,
+
+	# Re date start.
+	reStartDate: Date,
+
+	# Re date end.
+	reDateEnd: Date,
+
+	# Re exception date.
+	reExceptionDate: Date,
+
+	# Re occurence nb.
+	reOccurenceNb: String,
+
+	# Re fk modify.
+	reFkModify: Int!,
+
+	# Action sequence type.
+	sequenceType: ActionSequenceType!,
+
+	# External key.
+	externalKey: String,
+
+	# Vd category.
+	vdCategory: Int!,
+
+	# Vd sub category.
+	vdSubCategory: Int!,
+
+	# Delay.
+	delay: Time!
+}
+
+# Defines an action edge (entry), used for pagination.
+type ActionEdge {
+	# Actual action.
+	node: Action,
+
+	# Edge cursor.
+	cursor: Cursor
+}
+
+# Defines an action connection (list), used for pagination.
+type ActionConnection {
+	# Actions.
+	edges: [ActionsEdge],
+
+	# Page information.
+	pageInfo: PageInfo
+}
+
+# Complete representation of a webuser.
+type Webuser implements Node {
+	# Unique numerical identifier of the action.
+	id: ID!,
 }
