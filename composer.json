@@ -1,0 +1,12 @@
+{
+  "name": "kronostechnologies/crm-api",
+  "description": "Kronos Technologies GraphQL Schema",
+  "type": "library",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Marc-André Boily",
+      "email": "mboily@kronostechnologies.com"
+    }
+  ]
+}
