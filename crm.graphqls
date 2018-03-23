@@ -773,7 +773,10 @@ type IndividualContact implements Node, Contact {
 	notes: String,
 
 	# Calculated initials of the contact.
-	initials: String
+	initials: String,
+
+	# Actions of the contact. Can be sorted.
+	actions(first: Int, after: Cursor, from: Cursor, filters: ActionListFilters!): ActionConnection!
 }
 
 # Defines a basic individual contact.
@@ -800,10 +803,7 @@ input BaseIndividualContact {
     birthDate: Date,
 
     # Client number.
-    clientNb: String,
-
-	# Actions of the contact. Can be sorted.
-	actions(first: Int, after: Cursor, from: Cursor, filters: ActionListFilters!): ActionConnection!
+    clientNb: String
 }
 
 type CivilStatus {
@@ -1418,7 +1418,7 @@ type Action implements Node {
 	source: ActionSource!,
 
 	# Action is visible. Default: Y
-	visible: Bool!,
+	visible: Boolean!,
 
 	# Action end date
 	dateEnd: Date,
@@ -1433,55 +1433,55 @@ type Action implements Node {
 	nbDayEnd: Int!,
 
 	# Action alarm ?
-	alarm: Bool,
+	alarm: Boolean,
 
 	# Action alarm delay.
 	alarmDelay: Int!,
 
 	# Notice done ?
-	noticeDone: Bool,
+	noticeDone: Boolean,
 
 	# Foreign key to sequence parent.
 	fkSequenceParent: Int!,
 
 	# Action completion status.
-	completionStatus: ActionCompleteStatus,
+	completionStatus: ActionCompletionStatus,
 
 	# Notice add ?
-	noticeAdd: Bool,
+	noticeAdd: Boolean,
 
 	# Action re recurrence.
 	reRecurrence: ActionReRecurrence!,
 
 	# Re delete ?
-	reDelete: Bool!,
+	reDelete: Boolean!,
 
 	# Action re day.
-	reDay: ActionDay,
+	reDay: ActionReDay,
 
 	# Re day number.
 	reDayNumber: Int!,
 
 	# Re monday.
-	reMonday: Bool,
+	reMonday: Boolean,
 
 	# Re tuesday.
-	reTuesday: Bool,
+	reTuesday: Boolean,
 
 	# Re wednesday.
-	reWednesday: Bool,
+	reWednesday: Boolean,
 
 	# Re thursday.
-	reThursday: Bool,
+	reThursday: Boolean,
 
 	# Re friday.
-	reFriday: Bool,
+	reFriday: Boolean,
 
 	# Re saturday.
-	reSaturday: Bool,
+	reSaturday: Boolean,
 
 	# Re sunday.
-	reSunday: Bool,
+	reSunday: Boolean,
 
 	# Re week number.
 	reWeekNumber: String,
@@ -1493,7 +1493,7 @@ type Action implements Node {
 	reDayType: String,
 
 	# Action re mode.
-	reMode: ActionMode,
+	reMode: ActionReMode,
 
 	# Action re nth when.
 	reNthWhen: ActionReNthWhen,
@@ -1559,7 +1559,7 @@ type ActionEdge {
 # Defines an action connection (list), used for pagination.
 type ActionConnection {
 	# Actions.
-	edges: [ActionsEdge],
+	edges: [ActionEdge],
 
 	# Page information.
 	pageInfo: PageInfo
