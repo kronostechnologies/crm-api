@@ -124,8 +124,8 @@ enum ActionSource {
 
 # Action state
 enum ActionState {
-	self::TODO,
-	self::DONE
+	TODO,
+	DONE
 }
 
 # Activity type
