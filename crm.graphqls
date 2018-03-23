@@ -33,6 +33,13 @@ enum ActionCompletionStatus {
 	CANCELLED
 }
 
+# Action form type
+enum ActionFormType {
+	TODOR,
+	TODOS,
+	DONE
+}
+
 # Activity type
 enum ActivityType {
 	CALL,
