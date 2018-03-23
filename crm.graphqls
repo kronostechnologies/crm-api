@@ -121,6 +121,12 @@ enum ActionReYearMonth {
 	DECEMBER
 }
 
+# Action sequence type
+enum ActionSequenceType {
+	REGULAR,
+	LATENT
+}
+
 # Available contact segments.
 enum ContactSegment {
     SEGMENT_1,
