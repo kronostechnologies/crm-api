@@ -66,6 +66,12 @@ enum ActionReDay {
 	XDAY
 }
 
+# Action re mode
+enum ActionReMode {
+	DAY,
+	NTH
+}
+
 # Available contact segments.
 enum ContactSegment {
     SEGMENT_1,
