@@ -15,6 +15,17 @@ scalar Cursor
 
 # Enumerations
 
+# Action activity type
+enum ActionActivityType {
+	CALL,
+	LETTER,
+	MEETING,
+	VACATION,
+	FILE,
+	NOTE,
+	TASK
+}
+
 # Activity type
 enum ActivityType {
 	CALL,
