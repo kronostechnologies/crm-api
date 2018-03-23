@@ -72,6 +72,20 @@ enum ActionReMode {
 	NTH
 }
 
+# Action re nth day
+enum ActionReNthDay {
+	DAY,
+	WEEKDAY,
+	WEEKENDDAY,
+	MONDAY,
+	TUESDAY,
+	WEDNESDAY,
+	THURSDAY,
+	FRIDAY,
+	SATURDAY,
+	SUNDAY,
+}
+
 # Available contact segments.
 enum ContactSegment {
     SEGMENT_1,
