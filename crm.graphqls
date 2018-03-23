@@ -127,6 +127,12 @@ enum ActionSequenceType {
 	LATENT
 }
 
+# Action source
+enum ActionSource {
+	CRM,
+	EXCHANGE
+}
+
 # Available contact segments.
 enum ContactSegment {
     SEGMENT_1,
