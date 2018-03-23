@@ -60,6 +60,12 @@ enum ActivityType {
 	TASK
 }
 
+# Action re day
+enum ActionReDay {
+	WORKINGDAY,
+	XDAY
+}
+
 # Available contact segments.
 enum ContactSegment {
     SEGMENT_1,

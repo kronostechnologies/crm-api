@@ -11,6 +11,7 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 * Added `ActionCompletionStatusType` enum
 * Added `ActionFormTypeType` enum
 * Added `ActionPriorityType` enum
+* Added `ActionReDayType` enum
 
 ### 2017-05-17
 
