@@ -95,6 +95,16 @@ enum ActionReNthWhen {
 	LAST
 }
 
+# Action re recurrence
+enum ActionReRecurrence {
+	DAILY,
+	WEEKLY,
+	MONTHLY,
+	YEARLY,
+	NONE,
+	SINGLE
+}
+
 # Available contact segments.
 enum ContactSegment {
     SEGMENT_1,
