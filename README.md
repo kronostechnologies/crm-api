@@ -20,6 +20,13 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 * Added `ActionSequenceTypeType` enum
 * Added `ActionSourceType` enum
 * Added `ActionStateType` enum
+* Added `Action` type
+* Added `ActionEdge` type
+* Added `ActionConnection` type
+* Added `ActionListFilters` type
+* Added `Webuser` type
+* Added `actions` field to `IndividualContact` type
+* Added `actions` field to `OrganizationContact` type
 
 ### 2017-05-17
 
