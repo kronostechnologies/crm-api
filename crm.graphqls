@@ -49,17 +49,6 @@ enum ActionPriority {
 	PRIORITY_LOW
 }
 
-# Activity type
-enum ActivityType {
-	CALL,
-	LETTER,
-	MEETING,
-	VACATION,
-	FILE,
-	NOTE,
-	TASK
-}
-
 # Action re day
 enum ActionReDay {
 	WORKINGDAY,
@@ -137,6 +126,17 @@ enum ActionSource {
 enum ActionState {
 	self::TODO,
 	self::DONE
+}
+
+# Activity type
+enum ActivityType {
+	CALL,
+	LETTER,
+	MEETING,
+	VACATION,
+	FILE,
+	NOTE,
+	TASK
 }
 
 # Available contact segments.
