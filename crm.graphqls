@@ -636,10 +636,10 @@ type OrganizationContact implements Node, Contact {
 	notes: String,
 
 	# Organization abbreviation
-	abbreviation: String
+	abbreviation: String,
 
 	# Actions of the contact. Can be sorted.
-	actions(first: Int, after: Cursor, from: Cursor, filters: ActionListFilters!): ActionConnection!,
+	actions(first: Int, after: Cursor, from: Cursor, filters: ActionListFilters!): ActionConnection!
 }
 
 type IndividualContact implements Node, Contact {
@@ -800,10 +800,10 @@ input BaseIndividualContact {
     birthDate: Date,
 
     # Client number.
-    clientNb: String
+    clientNb: String,
 
 	# Actions of the contact. Can be sorted.
-	actions(first: Int, after: Cursor, from: Cursor, filters: ActionListFilters!): ActionConnection!,
+	actions(first: Int, after: Cursor, from: Cursor, filters: ActionListFilters!): ActionConnection!
 }
 
 type CivilStatus {
