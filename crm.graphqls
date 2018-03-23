@@ -133,6 +133,12 @@ enum ActionSource {
 	EXCHANGE
 }
 
+# Action state
+enum ActionState {
+	self::TODO,
+	self::DONE
+}
+
 # Available contact segments.
 enum ContactSegment {
     SEGMENT_1,
