@@ -40,6 +40,15 @@ enum ActionFormType {
 	DONE
 }
 
+# Action priority
+enum ActionPriority {
+	PRIORITY_HIGH,
+	PRIORITY_NORMAL_HIGH,
+	PRIORITY_NORMAL,
+	PRIORITY_NORMAL_LOW,
+	PRIORITY_LOW
+}
+
 # Activity type
 enum ActivityType {
 	CALL,
