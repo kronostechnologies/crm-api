@@ -8,6 +8,7 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 ### 2018-03-23
 
 * Added `ActionActivityTypeType` enum
+* Added `ActionCompletionStatusType` enum
 
 ### 2017-05-17
 

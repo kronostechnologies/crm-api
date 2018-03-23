@@ -26,6 +26,13 @@ enum ActionActivityType {
 	TASK
 }
 
+# Action completion status
+enum ActionCompletionStatus {
+	FINISHED,
+	PARTIAL,
+	CANCELLED
+}
+
 # Activity type
 enum ActivityType {
 	CALL,
