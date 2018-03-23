@@ -16,6 +16,7 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 * Added `ActionReNthDayType` enum
 * Added `ActionReNthWhenType` enum
 * Added `ActionReRecurrenceType` enum
+* Added `ActionReYearMonthType` enum
 
 ### 2017-05-17
 

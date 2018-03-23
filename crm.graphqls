@@ -105,6 +105,22 @@ enum ActionReRecurrence {
 	SINGLE
 }
 
+# Action re year month
+enum ActionReYearMonth {
+	JANUARY,
+	FEBRUARY,
+	MARCH,
+	APRIL,
+	MAY,
+	JUNE,
+	JULY,
+	AUGUST,
+	SEPTEMBER,
+	OCTOBER,
+	NOVEMBER,
+	DECEMBER
+}
+
 # Available contact segments.
 enum ContactSegment {
     SEGMENT_1,
