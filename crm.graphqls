@@ -42,11 +42,9 @@ enum ActionFormType {
 
 # Action priority
 enum ActionPriority {
-	PRIORITY_HIGH,
-	PRIORITY_NORMAL_HIGH,
-	PRIORITY_NORMAL,
-	PRIORITY_NORMAL_LOW,
-	PRIORITY_LOW
+	HIGH,
+	NORMAL,
+	LOW
 }
 
 # Action re day
