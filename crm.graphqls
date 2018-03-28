@@ -1376,7 +1376,7 @@ type Action implements Node {
 	# Subject of the activity.
 	subject: String,
 
-	# Action priority. PRIORITY_HIGH, PRIORITY_NORMAL_HIGH, PRIORITY_NORMAL, PRIORITY_NORMAL_LOW, PRIORITY_LOW. Default: PRIORITY_NORMAL_HIGH
+	# Action priority. HIGH, NORMAL, LOW. Default: NORMAL
 	priority: ActionPriority!,
 
 	# Action Location.
@@ -1401,13 +1401,13 @@ type Action implements Node {
 	createdBy: Webuser!,
 
 	# Action modified by.
-	modifiedBy: Webuser!,
+	modifiedBy: Webuser,
 
 	# Action date modified.
 	dateModified: DateTime,
 
 	# Action completed by.
-	completedBy: Webuser!,
+	completedBy: Webuser,
 
 	# Action date completed.
 	dateCompleted: DateTime,
@@ -1567,4 +1567,78 @@ type ActionConnection {
 type Webuser implements Node {
 	# Unique numerical identifier of the action.
 	id: ID!,
+
+	# Webuser email.
+	email: String,
+
+	# Webuser type.
+	webuserType: WebuserWebuserType!,
+
+	# Webuser role.
+	role: WebuserRole,
+
+	# Webuser in all user group ?
+	allUserGroup: Boolean!,
+
+	# Webuser screen name.
+	screenName: String,
+
+	# Webuser first name
+	firstName: String,
+	
+	# Webuser last name.
+	lastName: String,
+
+	# Webuser initials
+	initials: String,
+
+	# Webuser passwd
+	passwd: String,
+
+	# Webuser has concurrent access
+	concurrentAccess: Integer!,
+
+	# Webuser date start
+	dateStart: Date,
+
+	# Webuser date end
+	dateEnd: Date,
+
+	# Webuser is active ?
+	active: Boolean,
+
+	# Webuser is billable ?
+	billable: Boolean,
+
+	# Webuser primary language
+	prLang: WebuserPrLang,
+
+	# Webuser area code
+	prAreaCode: String,
+
+	# Webuser date created
+	dateCreated: DateTime,
+
+	diskspaceMail: String,
+	fkContact: String,
+	accessRestriction: String,
+	greetingUrl: String,
+	locale: String,
+	tz: String,
+	initialConf: String,
+	documentUsageMb: String,
+	mailUsageMb: String,
+	mailQuotaMb: String,
+	mailQuotaGetmailDisabled: String,
+	aclAll: String,
+	aclAllCustom: String,
+	online: String,
+	dateDeleted: String,
+	mobileTheme: String,
+	allowAclDelegation: String,
+	activeSyncDeleteActivity: String,
+	activeSyncDeleteContact: String,
+	activeSyncTodo: String,
+	activeSyncDone: String,
+	activeSyncContactGsend: String
 }
