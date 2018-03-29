@@ -1409,7 +1409,7 @@ type Action implements Node {
 	formType: ActionFormType!,
 
 	# Action activity type. CALL, LETTER, MEETING, VACATION, FILE, NOTE or TASK. default: CALL
-	type: ActionActivityType!,
+	activityType: ActionActivityType!,
 
 	# Action vd in out.
 	vdInOut: Int!,
