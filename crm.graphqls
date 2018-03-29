@@ -1439,7 +1439,7 @@ type Action implements Node {
 	vdAlarmUnit: Int!,
 
 	# Date the record was created.
-	dateCreated: Date,
+	dateCreated: DateTime,
 
 	# Action created by.
 	createdBy: Webuser!,
