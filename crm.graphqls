@@ -1456,6 +1456,9 @@ type Action implements Node {
 	# Action date modified.
 	dateModified: DateTime,
 
+	# Foreign key webuser completed
+	fkWebuserCompleted: Int,
+
 	# Action completed by.
 	completedBy: Webuser,
 
