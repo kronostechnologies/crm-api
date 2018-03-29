@@ -604,6 +604,9 @@ interface Contact {
 
 	# Notes for the contact.
 	notes: String
+
+	# Actions of the contact. Can be sorted.
+	actions(first: Int, after: Cursor, from: Cursor, filters: ActionListFilters!): ActionConnection!,
 }
 
 type OrganizationContact implements Node, Contact {
