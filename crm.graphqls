@@ -1637,7 +1637,7 @@ type Webuser implements Node {
 	passwd: String,
 
 	# Webuser has concurrent access
-	concurrentAccess: Integer!,
+	concurrentAccess: Int!,
 
 	# Webuser date start
 	dateStart: Date,
@@ -1661,10 +1661,10 @@ type Webuser implements Node {
 	dateCreated: DateTime,
 
 	# Diskspace mail.
-	diskspaceMail: Integer,
+	diskspaceMail: Int,
 
 	#  Foreign key contact.
-	fkContact: Integer,
+	fkContact: Int,
 
 	# Access restriction ?
 	accessRestriction: Boolean,
@@ -1682,13 +1682,13 @@ type Webuser implements Node {
 	initialConf: Boolean!,
 
 	# Document usage mb
-	documentUsageMb: Integer,
+	documentUsageMb: Int,
 
 	# Mail usage mb
-	mailUsageMb: Integer,
+	mailUsageMb: Int,
 
 	# Mail quoto mb
-	mailQuotaMb: Integer,
+	mailQuotaMb: Int,
 
 	# Mail quoto getmail disabled ?
 	mailQuotaGetmailDisabled: Boolean!,
@@ -1724,5 +1724,5 @@ type Webuser implements Node {
 	activeSyncDone: Boolean,
 
 	# Active sync contact gsend
-	activeSyncContactGsend: Integer
+	activeSyncContactGsend: Int
 }
