@@ -1430,7 +1430,7 @@ type Action implements Node {
 	dateStart: Date,
 
 	# Time when the action starts.
-	startTime: Time,
+	timeStart: Time,
 
 	# Time when the action ends.
 	timeEnd: Time,
