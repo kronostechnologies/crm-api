@@ -1441,6 +1441,9 @@ type Action implements Node {
 	# Date the record was created.
 	dateCreated: DateTime,
 
+	# Foreign key webuser created
+	fkWebuserCreated: Int,
+
 	# Action created by.
 	createdBy: Webuser!,
 
