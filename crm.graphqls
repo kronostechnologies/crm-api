@@ -258,6 +258,47 @@ enum SortOrder {
 	DESC
 }
 
+# Webuser Webuser Type
+enum WebuserWebuserType {
+	USER,
+	GROUP
+}
+
+# Webuser role
+enum WebuserRole {
+	ADMIN,
+	USER,
+	KRONOS
+}
+
+# Webuser pr lang
+enum WebuserPrLang {
+	FR,
+	EN
+}
+
+# Webuser acl all
+enum WebuserAclAll {
+	RWD,
+	X,
+	R,
+	RW,
+	RD
+}
+
+# Webuser active sync delete activity
+enum WebuserActiveSyncDeleteActivity {
+	TRANSFER_TO_DONE,
+	DELETE_FROM_KRONOS,
+	DO_NOTHING
+}
+
+# Webuser active sync delete contact
+enum WebuserActiveSyncDeleteContact {
+	REMOVE_FROM_SYNC,
+	DELETE_FROM_KRONOS,
+	DO_NOTHING
+}
 
 
 # Interfaces
