@@ -1447,6 +1447,9 @@ type Action implements Node {
 	# Action created by.
 	createdBy: Webuser!,
 
+	# Foreign key webuser modified
+	fkWebuserModified: Int,
+
 	# Action modified by.
 	modifiedBy: Webuser,
 
