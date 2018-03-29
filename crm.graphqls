@@ -1559,7 +1559,7 @@ type Action implements Node {
 	reMonthNumber: String,
 
 	# Re year month day.
-	reYeahMonthDay: String,
+	reYearMonthDay: String,
 
 	# Action re year month.
 	reYearMonth: ActionReYearMonth,
