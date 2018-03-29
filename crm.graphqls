@@ -1427,7 +1427,7 @@ type Action implements Node {
 	location: String,
 
 	# Date when the action starts.
-	startDate: Date,
+	dateStart: Date,
 
 	# Time when the action starts.
 	startTime: Time,
