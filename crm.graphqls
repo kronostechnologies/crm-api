@@ -1568,7 +1568,7 @@ type Action implements Node {
 	reDurationType: String,
 
 	# Re date start.
-	reStartDate: Date,
+	reDateStart: Date,
 
 	# Re date end.
 	reDateEnd: Date,
