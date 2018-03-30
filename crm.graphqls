@@ -1540,7 +1540,7 @@ input ActivityListFilters {
 
 input EventListFilters {
 	# The events need to be contained in the specified event types in order to be displayed. This filter is mandatory.
-	agendaTypeIn: [EventType!]!,
+	agendaTypeIn: [EventActivityType!]!,
 
 	# If specified, filter event based on completed flag.
 	isCompleted: Boolean,
@@ -1557,7 +1557,7 @@ input EventListFilters {
 
 input TaskListFilters {
 	# The tasks need to be contained in the specified task types in order to be displayed. This filter is mandatory.
-	agendaTypeIn: [TaskType!]!,
+	agendaTypeIn: [TaskActivityType!]!,
 
 	# If specified, filter task based on completed flag.
 	isCompleted: Boolean,
