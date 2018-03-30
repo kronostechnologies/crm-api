@@ -599,6 +599,12 @@ interface Contact {
 	# Activities of the contact. Can be sorted.
 	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
 
+	# Events of the contact. Can be sorted.
+	events(first: Int, after: Cursor, from: Cursor, filters: EventListFilters!): EventConnection!,
+
+	# Tasks of the contact. Can be sorted.
+	tasks(first: Int, after: Cursor, from: Cursor, filters: TaskListFilters!): TaskConnection!,
+
 	# Investments, or plans of the contact. (finance only)
 	plans: [Plan!]!,
 
@@ -670,6 +676,12 @@ type OrganizationContact implements Node, Contact {
 
 	# Activities of the contact. Can be sorted.
 	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
+
+	# Events of the contact. Can be sorted.
+	events(first: Int, after: Cursor, from: Cursor, filters: EventListFilters!): EventConnection!,
+
+	# Tasks of the contact. Can be sorted.
+	tasks(first: Int, after: Cursor, from: Cursor, filters: TaskListFilters!): TaskConnection!,
 
 	# Investments, or plans of the contact. (finance only)
 	plans: [Plan!]!,
@@ -810,6 +822,12 @@ type IndividualContact implements Node, Contact {
 
 	# Activities of the contact. Can be sorted.
 	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
+
+	# Events of the contact. Can be sorted.
+	events(first: Int, after: Cursor, from: Cursor, filters: EventListFilters!): EventConnection!,
+
+	# Tasks of the contact. Can be sorted.
+	tasks(first: Int, after: Cursor, from: Cursor, filters: TaskListFilters!): TaskConnection!,
 
 	# Investments, or plans of the contact. (finance only)
 	plans: [Plan!]!,
