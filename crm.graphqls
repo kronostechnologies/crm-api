@@ -137,6 +137,28 @@ enum ActivityType {
 	TASK
 }
 
+# Event type
+enum EventActivityType {
+	CALL,
+	LETTER,
+	MEETING,
+	VACATION,
+	FILE,
+	NOTE,
+	TASK
+}
+
+# Task type
+enum TaskActivityType {
+	CALL,
+	LETTER,
+	MEETING,
+	VACATION,
+	FILE,
+	NOTE,
+	TASK
+}
+
 # Available contact segments.
 enum ContactSegment {
     SEGMENT_1,
@@ -1011,6 +1033,249 @@ type ExceptionActivity {
 	deleted: Boolean!
 }
 
+# Complete representation of an event.
+type Event implements Node {
+	# Unique numerical identifier of the event.
+	id: ID!,
+
+	# API DEV: Assume false if null
+	# API DEV: Calculated field on state (TODO = false, DONE = true)
+
+	# True if the activity is considered completed.
+	isCompleted: Boolean!,
+
+	# Type of the event.
+	type: EventActivityType!,
+
+	# Subject of the event.
+	subject: String!,
+
+	# API DEV: Calculated field, ((!$row['time_start'] || $row['time_start'] == '00:00:00') && (!$row['time_end'] || $row['time_end'] == '00:00:00' || $row['time_end'] == '23:59:59') ? 'true' : 'false');
+
+	# True if the event lasts all day.
+	allDay: Boolean!,
+
+	# Computed date & time when the event starts.
+	startDateTime: DateTime,
+
+	# Computed date & time when the event ends.
+	endDateTime: DateTime,
+
+	# Date when the event starts.
+	startDate: Date,
+
+	# Date when the event ends.
+	endDate: Date,
+
+	# Time when the event starts.
+	startTime: Time,
+
+	# Time when the event ends.
+	endTime: Time,
+
+	# Date & Time the event was initially scheduled
+	initialDate: DateTime,
+
+	# Event location.
+	location: String,
+
+	# Event category.
+	category: FieldValue,
+
+	# Event sub-category.
+	subCategory: FieldValue,
+
+	# Event priority (1 to 5).
+	priority: Int,
+
+	# Returns true if a reminder is setup.
+	hasReminder: Boolean!,
+
+	# Reminder delay in minutes.
+	reminderDelay: Int,
+
+	# The recurrence rule for this event. The recurrence is a string conform to RFC 5545 (see RRULE http://tools.ietf.org/html/rfc5545#section-3.8.5.3).
+	recurrenceRule: String,
+
+	# The exception rule for this event. The exception is a string conform to RFC 5545 (see EXDATE http://tools.ietf.org/html/rfc5545#section-3.8.5.1).
+	exceptionRule: String,
+
+	# The details of the exception that are described in the RFC5545 ExDate ($exception) string.
+	# These object will never have their exception and exception_detail filled: An exception cannot have a recurrence.
+	# Thus exceptions cannot have exceptions.
+	exceptions: [ExceptionEvent],
+
+	# API DEV: Contained in action_notes table
+
+	# Notes of the event.
+	notes: String,
+
+	# Date the record was created.
+	creationDate: Date,
+
+	# Date the record was modified.
+	lastUpdateDate: Date
+}
+
+# Defines an event edge (entry), used for pagination.
+type EventEdge {
+	# Actual event.
+	node: Event,
+
+	# Edge cursor.
+	cursor: Cursor
+}
+
+# Defines an event connection (list), used for pagination.
+type EventConnection {
+	# Events.
+	edges: [EventEdge],
+
+	# Page information.
+	pageInfo: PageInfo
+}
+
+# Defines an event exception.
+type ExceptionEvent {
+	# Type of the event.
+	type: EventActivityType!,
+
+	# Subject of the event.
+	subject: String!,
+
+	# Date & time when the event starts.
+	startDate: DateTime!,
+
+	# Date & time when the event ends.
+	exceptionDate: DateTime!,
+
+	# The recurrent event is deleted for this date
+	deleted: Boolean!
+}
+
+# Complete representation of an task.
+type Task implements Node {
+	# Unique numerical identifier of the task.
+	id: ID!,
+
+	# API DEV: Assume false if null
+	# API DEV: Calculated field on state (TODO = false, DONE = true)
+
+	# True if the task is considered completed.
+	isCompleted: Boolean!,
+
+	# Type of the task.
+	type: TaskActivityType!,
+
+	# Subject of the event.
+	subject: String!,
+
+	# API DEV: Calculated field, ((!$row['time_start'] || $row['time_start'] == '00:00:00') && (!$row['time_end'] || $row['time_end'] == '00:00:00' || $row['time_end'] == '23:59:59') ? 'true' : 'false');
+
+	# True if the task lasts all day.
+	allDay: Boolean!,
+
+	# Computed date & time when the task starts.
+	startDateTime: DateTime,
+
+	# Computed date & time when the task ends.
+	endDateTime: DateTime,
+
+	# Date when the task starts.
+	startDate: Date,
+
+	# Date when the task ends.
+	endDate: Date,
+
+	# Time when the task starts.
+	startTime: Time,
+
+	# Time when the task ends.
+	endTime: Time,
+
+	# Date & Time the task was initially scheduled
+	initialDate: DateTime,
+
+	# Task location.
+	location: String,
+
+	# Task category.
+	category: FieldValue,
+
+	# Task sub-category.
+	subCategory: FieldValue,
+
+	# Task priority (1 to 5).
+	priority: Int,
+
+	# Returns true if a reminder is setup.
+	hasReminder: Boolean!,
+
+	# Reminder delay in minutes.
+	reminderDelay: Int,
+
+	# The recurrence rule for this event. The recurrence is a string conform to RFC 5545 (see RRULE http://tools.ietf.org/html/rfc5545#section-3.8.5.3).
+	recurrenceRule: String,
+
+	# The exception rule for this event. The exception is a string conform to RFC 5545 (see EXDATE http://tools.ietf.org/html/rfc5545#section-3.8.5.1).
+	exceptionRule: String,
+
+	# The details of the exception that are described in the RFC5545 ExDate ($exception) string.
+	# These object will never have their exception and exception_detail filled: An exception cannot have a recurrence.
+	# Thus exceptions cannot have exceptions.
+	exceptions: [ExceptionTask],
+
+	# API DEV: Contained in action_notes table
+
+	# Notes of the task.
+	notes: String,
+
+	# Date the record was created.
+	creationDate: Date,
+
+	# Date the record was modified.
+	lastUpdateDate: Date
+}
+
+# Defines a task edge (entry), used for pagination.
+type TaskEdge {
+	# Actual task.
+	node: Task,
+
+	# Edge cursor.
+	cursor: Cursor
+}
+
+# Defines an task connection (list), used for pagination.
+type TaskConnection {
+	# Tasks.
+	edges: [TaskEdge],
+
+	# Page information.
+	pageInfo: PageInfo
+}
+
+# Defines a task exception.
+type ExceptionTask {
+	# Type of the task.
+	type: TaskActivityType!,
+
+	# Subject of the tasl.
+	subject: String!,
+
+	# Date & time when the task starts.
+	startDate: DateTime!,
+
+	# Date & time when the task ends.
+	exceptionDate: DateTime!,
+
+	# The recurrent task is deleted for this date
+	deleted: Boolean!
+}
+
+
+
+
 # Defines an account plan entity.
 type Plan implements Node {
 	# Unique numerical identifier of the plan.
@@ -1243,6 +1508,40 @@ input ActivityListFilters {
 	agendaTypeIn: [ActivityType!]!,
 
 	# If specified, filter activity based on completed flag.
+	isCompleted: Boolean,
+
+	# Minimum start date.
+	minStartDate: DateTime,
+
+	# Maximum start date.
+	maxStartDate: DateTime,
+
+	# Sort order (of field sortDate).
+	sortOrder: SortOrder
+}
+
+input EventListFilters {
+	# The events need to be contained in the specified event types in order to be displayed. This filter is mandatory.
+	agendaTypeIn: [EventType!]!,
+
+	# If specified, filter event based on completed flag.
+	isCompleted: Boolean,
+
+	# Minimum start date.
+	minStartDate: DateTime,
+
+	# Maximum start date.
+	maxStartDate: DateTime,
+
+	# Sort order (of field sortDate).
+	sortOrder: SortOrder
+}
+
+input TaskListFilters {
+	# The tasks need to be contained in the specified task types in order to be displayed. This filter is mandatory.
+	agendaTypeIn: [TaskType!]!,
+
+	# If specified, filter task based on completed flag.
 	isCompleted: Boolean,
 
 	# Minimum start date.
