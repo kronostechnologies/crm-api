@@ -15,17 +15,6 @@ scalar Cursor
 
 # Enumerations
 
-# Activity type
-enum ActivityType {
-	CALL,
-	LETTER,
-	MEETING,
-	VACATION,
-	FILE,
-	NOTE,
-	TASK
-}
-
 # Event type
 enum EventActivityType {
 	CALL,
@@ -485,9 +474,6 @@ interface Contact {
 	# Emails of the contact.
 	emails: [Email],
 
-	# Activities of the contact. Can be sorted.
-	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
-
 	# Events of the contact. Can be sorted.
 	events(first: Int, after: Cursor, from: Cursor, filters: EventListFilters!): EventConnection!,
 
@@ -559,9 +545,6 @@ type OrganizationContact implements Node, Contact {
 
 	# Emails of the contact.
 	emails: [Email],
-
-	# Activities of the contact. Can be sorted.
-	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
 
 	# Events of the contact. Can be sorted.
 	events(first: Int, after: Cursor, from: Cursor, filters: EventListFilters!): EventConnection!,
@@ -703,9 +686,6 @@ type IndividualContact implements Node, Contact {
 	# Emails of the contact.
 	emails: [Email],
 
-	# Activities of the contact. Can be sorted.
-	activities(first: Int, after: Cursor, from: Cursor, filters: ActivityListFilters!): ActivityConnection!,
-
 	# Events of the contact. Can be sorted.
 	events(first: Int, after: Cursor, from: Cursor, filters: EventListFilters!): EventConnection!,
 
@@ -809,126 +789,6 @@ type ContactConnection {
 
 	# Page information.
 	pageInfo: PageInfo
-}
-
-# Complete representation of an activity.
-type Activity implements Node {
-	# Unique numerical identifier of the activity.
-	id: ID!,
-
-	# API DEV: Assume false if null
-	# API DEV: Calculated field on state (TODO = false, DONE = true)
-
-	# True if the activity is considered completed.
-	isCompleted: Boolean!,
-
-	# Type of the activity.
-	type: ActivityType!,
-
-	# Subject of the activity.
-	subject: String!,
-
-	# API DEV: Calculated field, ((!$row['time_start'] || $row['time_start'] == '00:00:00') && (!$row['time_end'] || $row['time_end'] == '00:00:00' || $row['time_end'] == '23:59:59') ? 'true' : 'false');
-
-	# True if the activity lasts all day.
-	allDay: Boolean!,
-
-	# Computed date & time when the activity starts.
-	startDateTime: DateTime,
-
-	# Computed date & time when the activity ends.
-	endDateTime: DateTime,
-
-	# Date when the activity starts.
-	startDate: Date,
-
-	# Date when the activity ends.
-	endDate: Date,
-
-	# Time when the activity starts.
-	startTime: Time,
-
-	# Time when the activity ends.
-	endTime: Time,
-
-	# Date & Time the activity was initially scheduled
-	initialDate: DateTime,
-
-	# Activity location.
-	location: String,
-
-	# Activity category.
-	category: FieldValue,
-
-	# Activity sub-category.
-	subCategory: FieldValue,
-
-	# Activity priority (1 to 5).
-	priority: Int,
-
-	# Returns true if a reminder is setup.
-	hasReminder: Boolean!,
-
-	# Reminder delay in minutes.
-	reminderDelay: Int,
-
-	# The recurrence rule for this event. The recurrence is a string conform to RFC 5545 (see RRULE http://tools.ietf.org/html/rfc5545#section-3.8.5.3).
-	recurrenceRule: String,
-
-	# The exception rule for this event. The exception is a string conform to RFC 5545 (see EXDATE http://tools.ietf.org/html/rfc5545#section-3.8.5.1).
-	exceptionRule: String,
-
-	# The details of the exception that are described in the RFC5545 ExDate ($exception) string.
-	# These object will never have their exception and exception_detail filled: An exception cannot have a recurrence.
-	# Thus exceptions cannot have exceptions.
-	exceptions: [ExceptionActivity],
-
-	# API DEV: Contained in action_notes table
-
-	# Notes of the activity.
-	notes: String,
-
-	# Date the record was created.
-	creationDate: Date,
-
-	# Date the record was modified.
-	lastUpdateDate: Date
-}
-
-# Defines an activity edge (entry), used for pagination.
-type ActivityEdge {
-	# Actual activity.
-	node: Activity,
-
-	# Edge cursor.
-	cursor: Cursor
-}
-
-# Defines an activity connection (list), used for pagination.
-type ActivityConnection {
-	# Activites.
-	edges: [ActivityEdge],
-
-	# Page information.
-	pageInfo: PageInfo
-}
-
-# Defines an activity exception.
-type ExceptionActivity {
-	# Type of the activity.
-	type: ActivityType!,
-
-	# Subject of the activity.
-	subject: String!,
-
-	# Date & time when the activity starts.
-	startDate: DateTime!,
-
-	# Date & time when the activity ends.
-	exceptionDate: DateTime!,
-
-	# The recurrent activity is deleted for this date
-	deleted: Boolean!
 }
 
 # Complete representation of an event.
@@ -1401,23 +1261,6 @@ input BaseWebsite {
 }
 
 # Inputs
-input ActivityListFilters {
-	# The activities need to be contained in the specified activity types in order to be displayed. This filter is mandatory.
-	agendaTypeIn: [ActivityType!]!,
-
-	# If specified, filter activity based on completed flag.
-	isCompleted: Boolean,
-
-	# Minimum start date.
-	minStartDate: DateTime,
-
-	# Maximum start date.
-	maxStartDate: DateTime,
-
-	# Sort order (of field sortDate).
-	sortOrder: SortOrder
-}
-
 input EventListFilters {
 	# The events need to be contained in the specified event types in order to be displayed. This filter is mandatory.
 	agendaTypeIn: [EventActivityType!]!,
