@@ -26,6 +26,12 @@ enum EventActivityType {
 	TASK
 }
 
+# Event state
+enum EventState {
+	TODO,
+	DONE
+}
+
 # Task type
 enum TaskActivityType {
 	CALL,
@@ -35,6 +41,12 @@ enum TaskActivityType {
 	FILE,
 	NOTE,
 	TASK
+}
+
+# Task state
+enum TaskState {
+	TODO,
+	DONE
 }
 
 # Available contact segments.
