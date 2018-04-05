@@ -1418,7 +1418,7 @@ type Mutation {
 
 # Complete representation of a webuser.
 type Webuser implements Node {
-	# Unique numerical identifier of the action.
+	# Unique numerical identifier of the webuser.
 	id: ID!,
 
 	# Webuser email.
