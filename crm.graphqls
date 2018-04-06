@@ -870,7 +870,7 @@ type Event implements Node {
 	subCategory: FieldValue,
 
 	# Event priority (1 to 5).
-	priority: Int,
+	priority: EventPriority,
 
 	# Returns true if a reminder is setup.
 	hasReminder: Boolean!,
@@ -990,7 +990,7 @@ type Task implements Node {
 	subCategory: FieldValue,
 
 	# Task priority (1 to 5).
-	priority: Int,
+	priority: TaskPriority,
 
 	# Returns true if a reminder is setup.
 	hasReminder: Boolean!,
