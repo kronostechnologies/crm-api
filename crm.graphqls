@@ -857,8 +857,8 @@ type Event implements Node {
 	# Time when the event ends.
 	endTime: Time,
 
-	# Date & Time the event was initially scheduled
-	initialDate: DateTime,
+	# Date the event was initially scheduled
+	initialDate: Date,
 
 	# Event location.
 	location: String,
@@ -977,8 +977,8 @@ type Task implements Node {
 	# Time when the task ends.
 	endTime: Time,
 
-	# Date & Time the task was initially scheduled
-	initialDate: DateTime,
+	# Date the task was initially scheduled
+	initialDate: Date,
 
 	# Task location.
 	location: String,
