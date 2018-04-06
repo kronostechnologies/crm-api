@@ -869,8 +869,8 @@ type Event implements Node {
 	# Event sub-category.
 	subCategory: FieldValue,
 
-	# Event priority (1 to 5).
-	priority: EventPriority,
+	# Event priority LOW, NORMAL or HIGH.
+	priority: EventPriority!,
 
 	# Returns true if a reminder is setup.
 	hasReminder: Boolean!,
@@ -989,8 +989,8 @@ type Task implements Node {
 	# Task sub-category.
 	subCategory: FieldValue,
 
-	# Task priority (1 to 5).
-	priority: TaskPriority,
+	# Task priority LOW, NORMAL or HIGH.
+	priority: TaskPriority!,
 
 	# Returns true if a reminder is setup.
 	hasReminder: Boolean!,
