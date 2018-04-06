@@ -892,7 +892,7 @@ type Event implements Node {
 	# API DEV: Contained in action_notes table
 
 	# Notes of the event.
-	notes: String,
+	notes: EventNote,
 
 	# Date the record was created.
 	creationDate: Date,
@@ -917,6 +917,18 @@ type EventConnection {
 
 	# Page information.
 	pageInfo: PageInfo
+}
+
+# EventNote
+type EventNote {
+	# Unique numerical identifier of the event note.
+	id: ID!,
+
+	# Internal notes
+	notes: String,
+
+	# Public notes
+	description: String
 }
 
 # Defines an event exception.
@@ -1012,7 +1024,7 @@ type Task implements Node {
 	# API DEV: Contained in action_notes table
 
 	# Notes of the task.
-	notes: String,
+	notes: TaskNote,
 
 	# Date the record was created.
 	creationDate: Date,
@@ -1037,6 +1049,18 @@ type TaskConnection {
 
 	# Page information.
 	pageInfo: PageInfo
+}
+
+# TaskNote
+type TaskNote {
+	# Unique numerical identifier of the task note.
+	id: ID!,
+
+	# Internal notes
+	notes: String,
+
+	# Public notes
+	description: String
 }
 
 # Defines a task exception.
