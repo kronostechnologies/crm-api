@@ -26,6 +26,13 @@ enum EventActivityType {
 	TASK
 }
 
+# Event priority
+enum EventPriority {
+	LOW
+	NORMAL
+	HIGH
+}
+
 # Event state
 enum EventState {
 	TODO,
@@ -41,6 +48,13 @@ enum TaskActivityType {
 	FILE,
 	NOTE,
 	TASK
+}
+
+# Task priority
+enum TaskPriority {
+	LOW
+	NORMAL
+	HIGH
 }
 
 # Task state
