@@ -920,7 +920,7 @@ type EventConnection {
 }
 
 # EventNote
-type EventNote implements Note {
+type EventNote implements Node {
 	# Unique numerical identifier of the event note.
 	id: ID!,
 
