@@ -920,7 +920,7 @@ type EventConnection {
 }
 
 # EventNote
-type EventNote {
+type EventNote implements Note {
 	# Unique numerical identifier of the event note.
 	id: ID!,
 
@@ -1052,7 +1052,7 @@ type TaskConnection {
 }
 
 # TaskNote
-type TaskNote {
+type TaskNote implements Node {
 	# Unique numerical identifier of the task note.
 	id: ID!,
 
