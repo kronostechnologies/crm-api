@@ -892,7 +892,7 @@ type Event implements Node {
 	# API DEV: Contained in action_notes table
 
 	# Notes of the event.
-	notes: EventNoteConnection,
+	notes: EventNote,
 
 	# Date the record was created.
 	creationDate: Date,
@@ -914,24 +914,6 @@ type EventEdge {
 type EventConnection {
 	# Events.
 	edges: [EventEdge],
-
-	# Page information.
-	pageInfo: PageInfo
-}
-
-# Defines an event edge (entry), used for pagination.
-type EventNoteEdge {
-	# Actual event.
-	node: EventNote,
-
-	# Edge cursor.
-	cursor: Cursor
-}
-
-# Defines an event connection (list), used for pagination.
-type EventNoteConnection {
-	# Events.
-	edges: EventNoteEdge,
 
 	# Page information.
 	pageInfo: PageInfo
