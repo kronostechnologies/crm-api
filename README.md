@@ -5,6 +5,28 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 
 ## Changelogs (most recent to oldest)
 
+### 2018-04-20
+
+* Remove `TASK` from `EventActivityType`
+* Remove `TaskActivityType`. Task are always `TASK`.
+* Remove  `compound`, `InterestCompoundFrequency`, `InterestInstallmentMode`, `InterestRate` too mutch detail for v1
+* Remove `ExceptionTask` and `rrule` for Tasks. Tasks does not have recurrence.
+* Remove `allDay`, `location`, `hasReminder`, `reminderDelay` from `Task`
+* Replace `EventNote` and `TaskNote` types by `description` and `internalNotes`. This is a low-level optimization detail that should not be exposed to the api.
+* Add `language` to the `User` type
+* Remove `Webuser` type. Duplicates `User` type and have too mutch informations.
+* Replace `EventState` and `TaskState` enum by `CalendarState`
+* Replace `EventPriority` and `TaskPriority` enum by `CalendarPriority`
+* Replace `CUS` by `CLIENT` in `ContactType` enum
+* Moved `rank` field to `IndividualContact` type only
+* Remove `startDate`, `endDate', `startTime`, `endTime' field on `Event` type. Use `startDateTime` and `endDateTime`
+* Rename `startDate` field to `startDateTime` for `ExceptionEvent`
+* Add `endDateTime` for `ExceptionEvent`
+* Modified `exceptionDate` field type from `DateTime` to `Date` for `ExceptionEvent`
+* Remove `startTime` and `endTime` from `Task` type
+* Expect `Task` date fields to change soon.
+* Renamed `main` fied by `isMain` for `Website` type
+
 ### 2018-03-23
 
 * Added `ActionActivityTypeType` enum

@@ -22,43 +22,18 @@ enum EventActivityType {
 	MEETING,
 	VACATION,
 	FILE,
-	NOTE,
-	TASK
+	NOTE
 }
 
-# Event priority
-enum EventPriority {
+# Event or Task priority
+enum CalendarPriority {
 	LOW
 	NORMAL
 	HIGH
 }
 
 # Event state
-enum EventState {
-	TODO,
-	DONE
-}
-
-# Task type
-enum TaskActivityType {
-	CALL,
-	LETTER,
-	MEETING,
-	VACATION,
-	FILE,
-	NOTE,
-	TASK
-}
-
-# Task priority
-enum TaskPriority {
-	LOW
-	NORMAL
-	HIGH
-}
-
-# Task state
-enum TaskState {
+enum CalendarState {
 	TODO,
 	DONE
 }
@@ -75,7 +50,7 @@ enum ContactSegment {
 
 # Contact type (actually Form Type in CRM)
 enum ContactType {
-	CUS,
+	CLIENT,
 	OTHER
 }
 
@@ -122,31 +97,6 @@ enum InsuranceCoverageType {
 	RIDER
 }
 
-# Frequency
-enum InterestCompoundFrequency {
-	WEEKLY,
-	SEMIMONTHLY,
-	MONTHLY,
-	BIMONTHLY,
-	QUARTERLY,
-	HALF_YEARLY,
-	YEARLY,
-	DAILY
-}
-
-# Interest Installment mode
-enum InterestInstallmentMode {
-	MATURITY,
-	WEEKLY,
-	SEMIMONTHLY,
-	MONTHLY,
-	BIMONTHLY,
-	QUARTERLY,
-	HALF_YEARLY,
-	YEARLY,
-	DAILY
-}
-
 # Language
 enum Language {
 	FRENCH,
@@ -184,47 +134,6 @@ enum SortOrder {
 	DESC
 }
 
-# Webuser Webuser Type
-enum WebuserWebuserType {
-	USER,
-	GROUP
-}
-
-# Webuser role
-enum WebuserRole {
-	ADMIN,
-	USER,
-	KRONOS
-}
-
-# Webuser pr lang
-enum WebuserPrLang {
-	FR,
-	EN
-}
-
-# Webuser acl all
-enum WebuserAclAll {
-	RWD,
-	X,
-	R,
-	RW,
-	RD
-}
-
-# Webuser active sync delete activity
-enum WebuserActiveSyncDeleteActivity {
-	TRANSFER_TO_DONE,
-	DELETE_FROM_KRONOS,
-	DO_NOTHING
-}
-
-# Webuser active sync delete contact
-enum WebuserActiveSyncDeleteContact {
-	REMOVE_FROM_SYNC,
-	DELETE_FROM_KRONOS,
-	DO_NOTHING
-}
 
 
 # Interfaces
@@ -258,10 +167,13 @@ type FieldValue implements Node {
 	# Unique numerical identifier of the field value.
 	id: ID!,
 
-	# French field value.
+	# Label of the field value in the current user language.
+	label: String!,
+
+	# French field value label.
 	fr: String!,
 
-	# English field value.
+	# English field value label.
 	en: String!,
 
 	# DEV: Équivalent du system_name mais hard-coded pour API
@@ -284,9 +196,10 @@ type User implements Node {
 	lastName: String,
 
 	# Email of the user.
-	email: String
+	email: String,
 
-	# TODO: todo/done Calendar ?
+	# Language of the user
+	language: Language
 }
 
 # Job entity.
@@ -408,16 +321,17 @@ type Phone implements Node {
 	# Actual phone number. The extension is included in it.
 	number: String!,
 
+	# Phone number's extension.
+	extension: String,
+
 	# API DEV: If longDistance is null, assume it is not the main address
 
 	# True if the phone number number is considered long distance.
 	longDistance: Boolean,
 
 	# Notes of the phone number.
-	notes: String,
+	notes: String
 
-	# Phone number's extension.
-	extension: String
 }
 
 # Representation of a phone entity used for inputting new phone numbers.
@@ -431,14 +345,15 @@ input BasePhone {
 	# Actual phone number. The extension is included in it.
 	number: String!,
 
+	# Phone number's extension.
+	extension: String,
+
 	# True if the phone number number is considered long distance.
 	longDistance: Boolean,
 
 	# Notes of the phone number.
-	notes: String,
+	notes: String
 
-	# Phone number's extension.
-	extension: String
 }
 
 # Representation of an email entity
@@ -446,7 +361,7 @@ type Email implements Node {
 	# Unique identifier of the email.
 	id: ID!,
 
-	# API DEV: If main is null, assume it is not the main address
+	# API DEV: If main is null, assume it is not the main email address
 
 	# True if this is considered a main email address.
 	main: Boolean!,
@@ -486,8 +401,6 @@ interface Contact {
 	# Contact categories/classes.
 	categories: [FieldValue],
 
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
 	# Contact origins.
 	referredBy: [FieldValue],
 
@@ -518,10 +431,6 @@ interface Contact {
 	# Date the record was modified
 	lastUpdateDate: Date,
 
-	# API DEV : IA Only. Leave blank for others
-
-	# Contact rank.
-	rank: String,
 
 	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
 
@@ -545,9 +454,8 @@ type OrganizationContact implements Node, Contact {
 	# Display name of the contact.
 	displayName: String,
 
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
-	# Contact i_contact_activity_domain
+	# API DEV i_contact_activity_domain
+	# Contact industries or line of business
 	industries: [FieldValue],
 
 	# Contact type, form type in CRM
@@ -593,11 +501,6 @@ type OrganizationContact implements Node, Contact {
 	# List of websites for this contact.
 	websites: [Website!]!,
 
-	# API DEV : IA Only. Leave blank for others
-
-	# Contact rank.
-	rank: String,
-
 	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
 
 	# Contact distribution lists
@@ -622,6 +525,9 @@ type IndividualContact implements Node, Contact {
 
 	# Last name of the contact.
 	lastName: String,
+
+	# Contact rank
+	rank: String,
 
 	# Decease date of the contact.
 	deceaseDate: Date,
@@ -758,6 +664,9 @@ input BaseIndividualContact {
     # Middle name of the contact.
     middleName: String,
 
+	# Contact rank.
+	rank: String,
+
     # True if contact is a smoker.
     smoker: Boolean,
 
@@ -845,17 +754,6 @@ type Event implements Node {
 	# Computed date & time when the event ends.
 	endDateTime: DateTime,
 
-	# Date when the event starts.
-	startDate: Date,
-
-	# Date when the event ends.
-	endDate: Date,
-
-	# Time when the event starts.
-	startTime: Time,
-
-	# Time when the event ends.
-	endTime: Time,
 
 	# Date the event was initially scheduled
 	initialDate: Date,
@@ -870,7 +768,7 @@ type Event implements Node {
 	subCategory: FieldValue,
 
 	# Event priority LOW, NORMAL or HIGH.
-	priority: EventPriority!,
+	priority: CalendarPriority!,
 
 	# Returns true if a reminder is setup.
 	hasReminder: Boolean!,
@@ -891,8 +789,11 @@ type Event implements Node {
 
 	# API DEV: Contained in action_notes table
 
-	# Notes of the event.
-	notes: EventNote,
+	# Description of the event.
+	description: String,
+
+	# Internal notes on the event.
+	internalNotes: String,
 
 	# Date the record was created.
 	creationDate: Date,
@@ -919,17 +820,6 @@ type EventConnection {
 	pageInfo: PageInfo
 }
 
-# EventNote
-type EventNote implements Node {
-	# Unique numerical identifier of the event note.
-	id: ID!,
-
-	# Internal notes
-	notes: String,
-
-	# Public notes
-	description: String
-}
 
 # Defines an event exception.
 type ExceptionEvent {
@@ -939,11 +829,15 @@ type ExceptionEvent {
 	# Subject of the event.
 	subject: String!,
 
-	# Date & time when the event starts.
-	startDate: DateTime!,
+	# Actual Date & time when the event exception starts.
+	startDateTime: DateTime!,
 
-	# Date & time when the event ends.
-	exceptionDate: DateTime!,
+	# Actual Date & time when the event exception ends.
+	endDateTime: DateTime!,
+
+	# Represent the date of the exception in the recurrence. This date is the
+	# same as the date found in the EXDATE of the master recurrence.
+	exceptionDate: Date!,
 
 	# The recurrent event is deleted for this date
 	deleted: Boolean!
@@ -960,16 +854,10 @@ type Task implements Node {
 	# True if the task is considered completed.
 	isCompleted: Boolean!,
 
-	# Type of the task.
-	type: TaskActivityType!,
-
 	# Subject of the event.
 	subject: String!,
 
 	# API DEV: Calculated field, ((!$row['time_start'] || $row['time_start'] == '00:00:00') && (!$row['time_end'] || $row['time_end'] == '00:00:00' || $row['time_end'] == '23:59:59') ? 'true' : 'false');
-
-	# True if the task lasts all day.
-	allDay: Boolean!,
 
 	# Computed date & time when the task starts.
 	startDateTime: DateTime,
@@ -983,17 +871,8 @@ type Task implements Node {
 	# Date when the task ends.
 	endDate: Date,
 
-	# Time when the task starts.
-	startTime: Time,
-
-	# Time when the task ends.
-	endTime: Time,
-
 	# Date the task was initially scheduled
 	initialDate: Date,
-
-	# Task location.
-	location: String,
 
 	# Task category.
 	category: FieldValue,
@@ -1002,29 +881,16 @@ type Task implements Node {
 	subCategory: FieldValue,
 
 	# Task priority LOW, NORMAL or HIGH.
-	priority: TaskPriority!,
+	priority: CalendarPriority!,
 
-	# Returns true if a reminder is setup.
-	hasReminder: Boolean!,
-
-	# Reminder delay in minutes.
-	reminderDelay: Int,
-
-	# The recurrence rule for this event. The recurrence is a string conform to RFC 5545 (see RRULE http://tools.ietf.org/html/rfc5545#section-3.8.5.3).
-	recurrenceRule: String,
-
-	# The exception rule for this event. The exception is a string conform to RFC 5545 (see EXDATE http://tools.ietf.org/html/rfc5545#section-3.8.5.1).
-	exceptionRule: String,
-
-	# The details of the exception that are described in the RFC5545 ExDate ($exception) string.
-	# These object will never have their exception and exception_detail filled: An exception cannot have a recurrence.
-	# Thus exceptions cannot have exceptions.
-	exceptions: [ExceptionTask],
 
 	# API DEV: Contained in action_notes table
 
-	# Notes of the task.
-	notes: TaskNote,
+	# Description of the task.
+	description: String,
+
+	# Internal notes on the task.
+	internalNotes: String,
 
 	# Date the record was created.
 	creationDate: Date,
@@ -1050,39 +916,6 @@ type TaskConnection {
 	# Page information.
 	pageInfo: PageInfo
 }
-
-# TaskNote
-type TaskNote implements Node {
-	# Unique numerical identifier of the task note.
-	id: ID!,
-
-	# Internal notes
-	notes: String,
-
-	# Public notes
-	description: String
-}
-
-# Defines a task exception.
-type ExceptionTask {
-	# Type of the task.
-	type: TaskActivityType!,
-
-	# Subject of the tasl.
-	subject: String!,
-
-	# Date & time when the task starts.
-	startDate: DateTime!,
-
-	# Date & time when the task ends.
-	exceptionDate: DateTime!,
-
-	# The recurrent task is deleted for this date
-	deleted: Boolean!
-}
-
-
-
 
 # Defines an account plan entity.
 type Plan implements Node {
@@ -1163,32 +996,9 @@ type PlanAccount implements Node {
 	# GIC InitialAmount
 	initialAmount: Float,
 
-	# Initial amount date.
+	# GIC Initial amount date.
 	initialAmountDate: Date,
 
-	# Compound interest frequency
-	compound: InterestCompoundFrequency,
-
-	# Interest installment mode frequency
-	interestInstallmentMode: InterestInstallmentMode,
-
-	# List of interest rates
-	interestRates: [InterestRate!]!
-}
-
-# Defines an interest rate.
-type InterestRate implements Node {
-	# Unique identifier for the interest rate.
-	id: ID!,
-
-	# Actual interest rate.
-	interestRate: Float,
-
-	# Start date from which the interest rate applies.
-	dateStart: Date!,
-
-	# End date until the interest rate applies. Inclusive.
-	dateEnd: Date!
 }
 
 # Defines an insurance policy entity.
@@ -1299,7 +1109,7 @@ type Website implements Node {
 	url: String!,
 
 	# True if the website is the main one specified.
-	main: Boolean!
+	isMain: Boolean!
 }
 
 input BaseWebsite {
@@ -1307,7 +1117,7 @@ input BaseWebsite {
 	url: String!,
 
 	# True if the website is the main one specified.
-	main: Boolean!
+	isMain: Boolean!
 }
 
 # Inputs
@@ -1329,9 +1139,6 @@ input EventListFilters {
 }
 
 input TaskListFilters {
-	# The tasks need to be contained in the specified task types in order to be displayed. This filter is mandatory.
-	agendaTypeIn: [TaskActivityType!]!,
-
 	# If specified, filter task based on completed flag.
 	isCompleted: Boolean,
 
@@ -1464,127 +1271,4 @@ type Mutation {
 
     # Deletes an email for the given contact.
     deleteContactWebsite(contactId: ID!, websiteId: ID!): Contact
-}
-
-# Complete representation of a webuser.
-type Webuser implements Node {
-	# Unique numerical identifier of the webuser.
-	id: ID!,
-
-	# Webuser email.
-	email: String,
-
-	# Webuser type.
-	webuserType: WebuserWebuserType!,
-
-	# Webuser role.
-	role: WebuserRole,
-
-	# Webuser in all user group ?
-	allUserGroup: Boolean!,
-
-	# Webuser screen name.
-	screenName: String,
-
-	# Webuser first name
-	firstName: String,
-	
-	# Webuser last name.
-	lastName: String,
-
-	# Webuser initials
-	initials: String,
-
-	# Webuser passwd
-	passwd: String,
-
-	# Webuser has concurrent access
-	concurrentAccess: Int!,
-
-	# Webuser date start
-	dateStart: Date,
-
-	# Webuser date end
-	dateEnd: Date,
-
-	# Webuser is active ?
-	active: Boolean,
-
-	# Webuser is billable ?
-	billable: Boolean,
-
-	# Webuser primary language
-	prLang: WebuserPrLang,
-
-	# Webuser area code
-	prAreaCode: String,
-
-	# Webuser date created
-	dateCreated: DateTime,
-
-	# Diskspace mail.
-	diskspaceMail: Int,
-
-	#  Foreign key contact.
-	fkContact: Int,
-
-	# Access restriction ?
-	accessRestriction: Boolean,
-
-	# Greeting url
-	greetingUrl: String,
-
-	# Locale
-	locale: String,
-
-	# Timezone
-	tz: String,
-
-	# Initial conf ?
-	initialConf: Boolean!,
-
-	# Document usage mb
-	documentUsageMb: Int,
-
-	# Mail usage mb
-	mailUsageMb: Int,
-
-	# Mail quoto mb
-	mailQuotaMb: Int,
-
-	# Mail quoto getmail disabled ?
-	mailQuotaGetmailDisabled: Boolean!,
-
-	# Acl all
-	aclAll: WebuserAclAll,
-
-	# Acl all custom
-	aclAllCustom: Boolean!,
-
-	# Online
-	online: Boolean,
-
-	# Date deleted
-	dateDeleted: DateTime,
-
-	# Mobile theme
-	mobileTheme: String,
-
-	# Allow acl delegation
-	allowAclDelegation: Boolean,
-
-	# Active sync delete activity
-	activeSyncDeleteActivity: WebuserActiveSyncDeleteActivity!,
-
-	# Active sync delete contact
-	activeSyncDeleteContact: WebuserActiveSyncDeleteContact!,
-
-	# Active sync todo
-	activeSyncTodo: Boolean!,
-
-	# Active sync done
-	activeSyncDone: Boolean,
-
-	# Active sync contact gsend
-	activeSyncContactGsend: Int
 }
