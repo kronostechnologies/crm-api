@@ -5,6 +5,11 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 
 ## Changelogs (most recent to oldest)
 
+### 2018-04-22
+
+* Updated documentation for `initials` field on `Contact` type. It is not generated.
+* Mutations are a work in progress.
+
 ### 2018-04-20
 
 * Remove `TASK` from `EventActivityType`

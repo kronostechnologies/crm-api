@@ -649,7 +649,7 @@ type IndividualContact implements Node, Contact {
 	# Notes for the contact.
 	notes: String,
 
-	# Calculated initials of the contact.
+	# initials of the contact.
 	initials: String,
 }
 
@@ -1187,6 +1187,7 @@ type Query {
 
 # Mutation types
 type Mutation {
+
     # ToDo: Remove job create, update, delete when the samples are no longer necessary.
 	# Creates a new Job.
 	createJob(job: BaseJob!): Job!,
