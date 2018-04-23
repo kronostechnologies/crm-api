@@ -57,7 +57,7 @@ enum FieldValueType {
 	CLASS,
 	ADDRESS_TYPE,
 	PHONE_TYPE,
-	CIVIL_STATUS,
+	MARITAL_STATUS,
 	CONTACT_CATEGORY,
 	CONTACT_DISTRIBUTION_LISTS,
 	CONTACT_REFERRED_BY,
@@ -192,26 +192,24 @@ type User implements Node {
 	language: Language
 }
 
-# Job entity.
-type Job implements Node {
-	# Unique numerical identifier of the job.
+# Occupation/ Job entity.
+type Occupation implements Node {
+	# Unique numerical identifier of the occupation.
 	id: ID!,
 
-	# Name of the job.
+	# Name of the occupation / job.
 	occupation: String,
 
 	# Employer name.
-	employer: String
+	employer: String,
+
+	# Date the occupation started
+	startDate: Date,
+
+	# Date the occupation finished
+	endDate: Date,
 }
 
-# BaseJob mutation entity.
-input BaseJob {
-	# Name of the job.
-	occupation: String,
-
-	# Employer name.
-	employer: String
-}
 
 # Address entity.
 type Address implements Node {
@@ -310,6 +308,17 @@ type Email implements Node {
 	notes: String
 }
 
+type Website implements Node {
+	# Unique numerical identifier for the website.
+	id: ID!,
+
+	# Website's URL.
+	url: String!,
+
+	# True if the website is the main one specified.
+	isMain: Boolean!
+}
+
 type ContactPicture {
 
 	# API DEV: Through fk_document_picture, it should be possible to fetch a public URL
@@ -317,6 +326,20 @@ type ContactPicture {
 	# Url to fetch the picture data
 	url: String,
 
+}
+
+type MaritalStatus implements Node {
+	# Civil status ID.
+	id: ID!,
+
+	# Date when the civil status starts.
+	startDate: Date,
+
+	# Date when the civil status ends.
+	endDate: Date,
+
+	# Civil status value.
+	status: FieldValue!
 }
 
 type ContactSegmentation {
@@ -338,6 +361,11 @@ type ContactSegmentation {
 
 	# Contact origins.
 	referredBy: [FieldValue] @fieldValue(type: "CONTACT_REFERRED_BY"),
+
+	# API DEV i_contact_activity_domain
+
+	# Contact industries / domain / line of business
+	industries: [FieldValue],
 
 	# Segments 1.
 	seg1: FieldValue @fieldValue(type: "CONTACT_SEGMENT_1"),
@@ -368,6 +396,12 @@ interface Contact {
 	# Contact type, form type in CRM
 	contactType: ContactType!,
 
+	# Display name of the contact.
+	displayName: String,
+
+	# Picture of the contact.
+	picture: ContactPicture,
+
 	# Regroup contact segmentation informations
 	segmentation: ContactSegmentation,
 
@@ -389,10 +423,10 @@ interface Contact {
 	# Tasks of the contact. Can be sorted.
 	tasks(first: Int, after: Cursor, from: Cursor, filters: TaskListFilters!): TaskConnection!,
 
-	# Investments, or plans of the contact. (finance only)
+	# Investments, or plans of the contact.
 	plans: [Plan!]!,
 
-	# Insurance policies of the contact. (finance only)
+	# Insurance policies of the contact.
 	policies: [InsurancePolicy!]!,
 
 	# Notes for the contact.
@@ -412,18 +446,23 @@ type OrganizationContact implements Node, Contact {
 	# Unique numerical identifier of the contact.
 	id: ID!,
 
+	# Organization abbreviation
+	abbreviation: String,
+
 	# Corporation/organization name.
 	corporationName: String,
+
+	# Corporation/organization second line.
+	corporationNameLine2: String,
+
+	# Contact type, form type in CRM
+	contactType: ContactType!,
 
 	# Display name of the contact.
 	displayName: String,
 
-	# API DEV i_contact_activity_domain
-	# Contact industries or line of business
-	industries: [FieldValue],
-
-	# Contact type, form type in CRM
-	contactType: ContactType!,
+	# Picture of the contact.
+	picture: ContactPicture,
 
 	# Regroup contact segmentation informations
 	segmentation: ContactSegmentation,
@@ -437,32 +476,29 @@ type OrganizationContact implements Node, Contact {
 	# Emails of the contact.
 	emails: [Email],
 
+	# List of websites for this contact.
+	websites: [Website!]!,
+
 	# Events of the contact. Can be sorted.
 	events(first: Int, after: Cursor, from: Cursor, filters: EventListFilters!): EventConnection!,
 
 	# Tasks of the contact. Can be sorted.
 	tasks(first: Int, after: Cursor, from: Cursor, filters: TaskListFilters!): TaskConnection!,
 
-	# Investments, or plans of the contact. (finance only)
+	# Investments, or plans of the contact
 	plans: [Plan!]!,
 
-	# Insurance policies of the contact. (finance only)
+	# Insurance policies of the contact.
 	policies: [InsurancePolicy!]!,
+
+	# Notes for the contact.
+	notes: String,
 
 	# Date the record was modified
 	creationDate: Date,
 
 	# Date the record was modified
 	lastUpdateDate: Date,
-
-	# List of websites for this contact.
-	websites: [Website!]!,
-
-	# Notes for the contact.
-	notes: String,
-
-	# Organization abbreviation
-	abbreviation: String,
 }
 
 type IndividualContact implements Node, Contact {
@@ -505,27 +541,23 @@ type IndividualContact implements Node, Contact {
 	smokerEndDate: Date,
 
 	# API DEV: In marital_status table, must do a TOP 1 query to fetch it, and it can be NULL
-	# API DEV: civilStatus is in vdvalues (vd_marital_status)
 
-	# Latest civil status of the contact.
-	civilStatus: CivilStatus,
+	# Current marital status of the contact.
+	currentMaritalStatus: MaritalStatus,
+
+	# List of current and past marital statuses
+	maritalStatuses: [MaritalStatus!]!,
 
 	# API DEV: 1-1 relationship with job table from contacts
 
-	# Contact's job.
-	job: Job,
+	# Contact's current occupation.
+	currentOccupation: Occupation,
 
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+	# List of all occupations / job for the contact.
+	occupations: [Occupation!]!,
 
-	# Contact hobbies
-	hobbies: [FieldValue]!,
-
-	# API DEV: Segments must be fetched with vd_seg# and vdvalues
-
+	# Regroup segmentation fields
 	segmentation: ContactSegmentation,
-
-	# Picture of the contact.
-	picture: ContactPicture,
 
 	# API DEV: Parse vdvalue to return a Gender enum value
 
@@ -546,9 +578,14 @@ type IndividualContact implements Node, Contact {
 	# List of websites for this contact.
 	websites: [Website!]!,
 
-
 	# Contact type, form type in CRM
 	contactType: ContactType!,
+
+	# Display name of the contact.
+	displayName: String,
+
+	# Picture of the contact.
+	picture: ContactPicture,
 
 	# Addresses of the contact.
 	addresses: [Address],
@@ -565,10 +602,10 @@ type IndividualContact implements Node, Contact {
 	# Tasks of the contact. Can be sorted.
 	tasks(first: Int, after: Cursor, from: Cursor, filters: TaskListFilters!): TaskConnection!,
 
-	# Investments, or plans of the contact. (finance only)
+	# Investments, or plans of the contact.
 	plans: [Plan!]!,
 
-	# Insurance policies of the contact. (finance only)
+	# Insurance policies of the contact.
 	policies: [InsurancePolicy!]!,
 
 	# Date the record was modified
@@ -584,32 +621,6 @@ type IndividualContact implements Node, Contact {
 	additionnalInformations: String,
 }
 
-
-
-type CivilStatus {
-    # Civil status ID.
-    id: ID!,
-
-    # Date when the civil status starts.
-    startDate: Date,
-
-    # Date when the civil status ends.
-    endDate: Date,
-
-    # Civil status value.
-    status: FieldValue!
-}
-
-input BaseCivilStatus {
-    # Date when the civil status starts.
-    startDate: Date,
-
-    # Date when the civil status ends.
-    endDate: Date,
-
-    # Civil status value.
-    status: FieldValue!
-}
 
 # Defines a contact edge (entry), used for pagination.
 type ContactEdge {
@@ -1004,16 +1015,6 @@ type InsuranceInsured {
 	isSmoker: Boolean
 }
 
-type Website implements Node {
-	# Unique numerical identifier for the website.
-	id: ID!,
-
-	# Website's URL.
-	url: String!,
-
-	# True if the website is the main one specified.
-	isMain: Boolean!
-}
 
 # Inputs
 input EventListFilters {
@@ -1104,11 +1105,22 @@ type Mutation {
 	# Remove an adress from the given contact. The address will be deleted if not linked to another contact
 	removeFromContactAddresses(input: RemoveFromContactAddressesInput!): RemoveFromContactAddressesPayload,
 
+	# Update an existing address
+	updateAddress(input: UpdateAddressInput!): UpdateAddressPayload,
+
+	# Select the main address to use for a contact
+	setContactMainAddress(input: SetContactMainAddressInput!): SetContactMainAddressPayload,
+
+	# Select the main address to use for a contact
+	setContactPostalAddress(input: SetContactPostalAddressInput!): SetContactPostalAddressPayload,
+
 	# Adds an address for the given contact.
 	addToContactPhones(input: AddToContactPhonesInput!): AddToContactPhonesPayload,
 
 	# Remove a phone for the given contact.
 	removeFromContactPhones(input: RemoveFromContactPhonesInput!): RemoveFromContactPhonesPayload,
+
+	# TODO: updatePhone()
 
 	# Adds an address for the given contact.
 	addToContactEmails(input: AddToContactEmailsInput!): AddToContactEmailsPayload,
@@ -1116,47 +1128,37 @@ type Mutation {
 	# Remove a email for the given contact.
 	removeFromContactEmails(input: RemoveFromContactEmailsInput!): RemoveFromContactEmailsPayload,
 
+	# TODO: updateEmail()
+
 	# Adds an address for the given contact.
 	addToContactWebsites(input: AddToContactWebsitesInput!): AddToContactWebsitesPayload,
 
 	# Remove a website for the given contact.
 	removeFromContactWebsites(input: RemoveFromContactWebsitesInput!): RemoveFromContactWebsitesPayload,
 
-	# Segmentation
+	# TODO: updateWebsite()
 
-	# Job
+	# TODO phase ultérieur : addToContactOccupations().
+	# TODO phase ultérieur : removeFromContactOccupations()
+	# TODO phase ultérieur : addToContactMaritalStatuses().
+	# TODO phase ultérieur : removeFromContactMaritalStatuses()
+	# TODO phase ultérieur : addToContactCategories()
+	# TODO phase ultérieur : removeFromContactCategories()
+	# TODO phase ultérieur : addToContactDistributionLists()
+	# TODO phase ultérieur : removeFromContactDistributionLists()
+	# TODO phase ultérieur : addToContactReferredBy()
+	# TODO phase ultérieur : removeFromContactReferredBy()
+	# TODO phase ultérieur : addToContactIndustries()
+	# TODO phase ultérieur : removeFromContactIndustries()
+	# TODO phase ultérieur : addToContactHobbies()
+	# TODO phase ultérieur : removeFromContactHobbies()
+
 
 	deleteContact(input: DeleteContactInput!): DeleteContactPayload,
 
-	#####
 
 	# TODO Event Add/Update/Delete/trf en réalisé
 	# TODO Task Add/Update/Delete/trf en réalisé
-
-
-	######################## DEPRECATED
-
-	# Creates a new Job.
-	createJob(job: BaseJob!): Job!,
-
-	# Updates job.
-	updateJob(id: ID!, job: BaseJob!): Job!,
-
-	# Deletes job.
-	deleteJob(id: ID!): Boolean!,
-
-	# Sets an individual contact civil status.
-    addIndividualContactCivilStatus(contactId: ID!, civilStatusId: ID, since: Date): IndividualContact,
-
-    # Deletes an individual contact civil status.
-    deleteIndividualContactCivilStatus(contactId: ID!, civilStatusId: ID): IndividualContact,
-
-    # Adds an individual contact job.
-    addIndividualContactJob(contactId: ID!, job: BaseJob!): IndividualContact,
-
-    # Deletes an individual contact job.
-    deleteIndividualContactJob(contactId: ID!, jobId: ID!): IndividualContact,
-
 }
 
 input CreateIndividualContactInput {
@@ -1165,9 +1167,26 @@ input CreateIndividualContactInput {
 
 	identification: CreateIndividualContactIdentificationInput,
 
+	# Regroup additionnal fields
 	additionalInfo: IndividualContactAdditionalInfoInput,
 
+	# Regroup segmentation fields
 	segmentation: ContactSegmentationInput,
+
+	# Contact occupation(s). currentOccupation will be computed.
+	occupations: [OccupationInput!],
+
+	# Create Address for the contact
+	addresses: [CreateAddressInput!],
+
+	# Create Phone for the contact
+	phones: [CreatePhoneInput!],
+
+	# Create email for the contact
+	emails: [CreateEmailInput!],
+
+	# Create Website for the contact
+	websites: [CreateWebsiteInput!],
 
 	# Notes for the contact.
 	notes: String,
@@ -1238,8 +1257,14 @@ input UpdateIndividualContactInput {
 
 	contactId: ID!
 
-	# ou patch ? TODO
+	# Update contact identification
 	identification: UpdateIndividualContactIdentificationInput,
+
+	# Segmentation fields
+	segmentation: ContactSegmentationInput,
+
+	# Contact occupation(s). currentOccupation will be computed.
+	occupations: [OccupationInput!],
 
 	# Notes for the contact.
 	notes: String,
@@ -1294,7 +1319,8 @@ input CreateOrganizationContactInput {
 
 	identification: CreateOrganizationContactIdentificationInput,
 
-	#segmentation: ContactSegmentationInput,
+	# Segmentation fields
+	segmentation: ContactSegmentationInput,
 
 }
 
@@ -1326,9 +1352,14 @@ input CreateOrganizationContactIdentificationInput {
 
 input UpdateOrganizationContactInput {
 
-	contactId: ID,
+	# Id of the contact to update
+	contactId: ID!,
 
+	# Identification fields
 	identification: UpdateOrganizationContactIdentificationInput,
+
+	# Segmentation fields
+	segmentation: ContactSegmentationInput,
 
 }
 
@@ -1444,6 +1475,83 @@ input CreateAddressInput {
 
 	# City of the address.
 	city: String
+}
+
+input SetContactMainAddressInput {
+
+	# Id of the contac to update the address for.
+	contactId: ID!,
+
+	# Address id
+	addressId: ID!
+}
+
+type SetContactMainAddressPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Contact the address was updated for
+	contact: Contact,
+}
+
+input SetContactPostalAddressInput {
+
+	# Id of the contac to update the address for.
+	contactId: ID!,
+
+	# Address id
+	addressId: ID!
+}
+
+type SetContactPostalAddressPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Contact the address was updated for
+	contact: Contact,
+}
+
+input UpdateAddressInput {
+
+	# Id of the address to update
+	addressId: ID!,
+
+	# Type of the address.
+	typeId: ID @fieldValueId(type: "ADDRESS_TYPE"),
+
+	# First line of the address.
+	line1: String,
+
+	# Second line of the address.
+	line2: String,
+
+	# State or province of the address.
+	stateProvince: String,
+
+	# Country of the address.
+	country: String,
+
+	# Postal/zip code of the address.
+	postalCode: String,
+
+	# Date which the address became active.
+	dateSince: Date,
+
+	# City of the address.
+	city: String
+
+}
+
+type UpdateAddressPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# The updated address
+	address: Address
+
 }
 
 input RemoveFromContactAddressesInput {
@@ -1596,6 +1704,28 @@ type RemoveFromContactWebsitesPayload {
 
 	# Contact the website was removed from
 	contact: Contact,
+}
+
+
+input OccupationInput {
+
+	# Name of the occupation / job.
+	occupation: String,
+
+	# Employer name.
+	employer: String
+}
+
+
+input MaritalStatusInput {
+	# Date when the marital status starts.
+	startDate: Date,
+
+	# Date when the marital status ends.
+	endDate: Date,
+
+	# Marital status value.
+	status: FieldValue!
 }
 
 input DeleteContactInput {

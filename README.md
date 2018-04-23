@@ -14,8 +14,13 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 * Add `additionnalInformations` to `Contact` for "peculiarities".
 * Rename `smoker` field by `isSmoker`
 * Regroup segmentation fields into `ContactSegmentation` type. `categories`, `distributionLists`, `referredBy`, `seg1`, `seg2`,..., `territory`
-* Rename `main` by `isMain`
-* Rename `postal` by `isPostal`
+* Rename `main` to `isMain`
+* Rename `postal` to `isPostal`
+* Rename `Job` to `Occupation`
+* Split `job` field in `currentOccupation` and `occupations`
+* Rename `CivilStatus` by `MaritalStatus`.
+* Rename `CIVIL_STATUS` to `MARITAL_STATUS`.
+* Split `civilStatus into `currentMaritalStatus` and `maritalStatuses`
 
 ### 2018-04-20
 
