@@ -38,16 +38,6 @@ enum CalendarState {
 	DONE
 }
 
-# Available contact segments.
-enum ContactSegment {
-    SEGMENT_1,
-    SEGMENT_2,
-    SEGMENT_3,
-    SEGMENT_4,
-    SEGMENT_5,
-    SEGMENT_6
-}
-
 # Contact type (actually Form Type in CRM)
 enum ContactType {
 	CLIENT,
@@ -232,12 +222,12 @@ type Address implements Node {
 	# API DEV: If main is null, assume it is not the main address
 
 	# True if this is considered as a main address.
-	main: Boolean!,
+	isMain: Boolean!,
 
 	# API DEV: If postal is null, assume it is not a postal address
 
 	# True if this is considered as a postal address.
-	postal: Boolean!,
+	isPostal: Boolean!,
 
 	# API DEV: Is a vdvalue
 
@@ -266,42 +256,6 @@ type Address implements Node {
 	city: String
 }
 
-# Address entity for inputs.
-input BaseAddress {
-	# True if this is considered as a main address.
-	main: Boolean!,
-
-	# API DEV: If postal is null, assume it is not a postal address
-
-	# True if this is considered as a postal address.
-	postal: Boolean!,
-
-	# API DEV: Is a vdvalue
-
-	# Translated type of the address.
-	type: ID!,
-
-	# First line of the address.
-	line1: String!,
-
-	# Second line of the address.
-	line2: String,
-
-	# State or province of the address.
-	stateProvince: String,
-
-	# Country of the address.
-	country: String,
-
-	# Postal/zip code of the address.
-	postalCode: String,
-
-	# Date which the address became active.
-	dateSince: Date,
-
-	# City of the address.
-	city: String
-}
 
 # Representation of a phone entity
 type Phone implements Node {
@@ -311,7 +265,7 @@ type Phone implements Node {
 	# API DEV: If main is null, assume it is not the main address
 
 	# True if this is considered a main phone number.
-	main: Boolean!,
+	isMain: Boolean!,
 
 	# API DEV: vdvalue with vd_type_phone
 
@@ -334,28 +288,6 @@ type Phone implements Node {
 
 }
 
-# Representation of a phone entity used for inputting new phone numbers.
-input BasePhone {
-	# True if this is considered a main phone number.
-	main: Boolean!,
-
-	# Type of the phone number.
-	type: ID,
-
-	# Actual phone number. The extension is included in it.
-	number: String!,
-
-	# Phone number's extension.
-	extension: String,
-
-	# True if the phone number number is considered long distance.
-	longDistance: Boolean,
-
-	# Notes of the phone number.
-	notes: String
-
-}
-
 # Representation of an email entity
 type Email implements Node {
 	# Unique identifier of the email.
@@ -364,7 +296,7 @@ type Email implements Node {
 	# API DEV: If main is null, assume it is not the main email address
 
 	# True if this is considered a main email address.
-	main: Boolean!,
+	isMain: Boolean!,
 
 	# API DEV: vd_type_email
 
@@ -378,31 +310,66 @@ type Email implements Node {
 	notes: String
 }
 
-input BaseEmail {
-    # True if this is considered a main email address.
-    main: Boolean!,
+type ContactPicture {
 
-	# Type of the email address.
-	type: ID,
+	# API DEV: Through fk_document_picture, it should be possible to fetch a public URL
 
-	# Actual email address.
-	email: String!,
+	# Url to fetch the picture data
+	url: String,
 
-	# Notes of the email address.
-	notes: String
 }
 
-interface Contact {
-	# Contact type, form type in CRM
-	contactType: ContactType!,
+type ContactSegmentation {
 
 	# API DEV: Fetch with i_contact_class, it uses vdvalues too
 
 	# Contact categories/classes.
-	categories: [FieldValue],
+	categories: [FieldValue] @fieldValue(type: "CONTACT_CATEGORY"),
+
+	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
+
+	# Contact distribution lists
+	distributionLists: [FieldValue] @fieldValue(type: "CONTACT_DISTRIBUTION_LISTS"),
+
+	# Contact hobbies.
+	hobbies: [FieldValue] @fieldValue(type: "CONTACT_HOBBY"),
+
+	# API DEV: i_contact_origin
 
 	# Contact origins.
-	referredBy: [FieldValue],
+	referredBy: [FieldValue] @fieldValue(type: "CONTACT_REFERRED_BY"),
+
+	# Segments 1.
+	seg1: FieldValue @fieldValue(type: "CONTACT_SEGMENT_1"),
+
+	# Segments 2.
+	seg2: FieldValue @fieldValue(type: "CONTACT_SEGMENT_2"),
+
+	# Segments 3.
+	seg3: FieldValue @fieldValue(type: "CONTACT_SEGMENT_3"),
+
+	# Segments 4.
+	seg4: FieldValue @fieldValue(type: "CONTACT_SEGMENT_4"),
+
+	# Segments 5.
+	seg5: FieldValue @fieldValue(type: "CONTACT_SEGMENT_5"),
+
+	# Segments 6.
+	seg6: FieldValue @fieldValue(type: "CONTACT_SEGMENT_6"),
+
+	# API DEV: Fetch with vdvalues (vd_territory)
+
+	# Translated territory name of the contact.
+	territory: FieldValue @fieldValue(type: "CONTACT_TERRITORY"),
+}
+
+interface Contact {
+
+	# Contact type, form type in CRM
+	contactType: ContactType!,
+
+	# Regroup contact segmentation informations
+	segmentation: ContactSegmentation,
 
 	# Addresses of the contact.
 	addresses: [Address],
@@ -412,6 +379,9 @@ interface Contact {
 
 	# Emails of the contact.
 	emails: [Email],
+
+	# List of websites for this contact.
+	websites: [Website!]!,
 
 	# Events of the contact. Can be sorted.
 	events(first: Int, after: Cursor, from: Cursor, filters: EventListFilters!): EventConnection!,
@@ -425,23 +395,17 @@ interface Contact {
 	# Insurance policies of the contact. (finance only)
 	policies: [InsurancePolicy!]!,
 
+	# Notes for the contact.
+	notes: String,
+
+	# Additional informational notes / peculiarity
+	additionnalInformations: String,
+
 	# Date the record was modified
 	creationDate: Date,
 
 	# Date the record was modified
 	lastUpdateDate: Date,
-
-
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
-	# Contact distribution lists
-	distributionLists: [FieldValue],
-
-	# List of websites for this contact.
-	websites: [Website!]!,
-
-	# Notes for the contact.
-	notes: String
 }
 
 type OrganizationContact implements Node, Contact {
@@ -461,15 +425,8 @@ type OrganizationContact implements Node, Contact {
 	# Contact type, form type in CRM
 	contactType: ContactType!,
 
-	# API DEV: Fetch with i_contact_class, it uses vdvalues too
-
-	# Contact categories/classes.
-	categories: [FieldValue],
-
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
-	# Contact origins.
-	referredBy: [FieldValue],
+	# Regroup contact segmentation informations
+	segmentation: ContactSegmentation,
 
 	# Addresses of the contact.
 	addresses: [Address],
@@ -501,11 +458,6 @@ type OrganizationContact implements Node, Contact {
 	# List of websites for this contact.
 	websites: [Website!]!,
 
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
-	# Contact distribution lists
-	distributionLists: [FieldValue],
-
 	# Notes for the contact.
 	notes: String,
 
@@ -517,27 +469,39 @@ type IndividualContact implements Node, Contact {
 	# Unique numerical identifier of the contact.
 	id: ID!,
 
+	#Title / Prefix / Civility of the contact. FieldValue ID.
+	title: FieldValue,
+
 	# First name of the contact.
 	firstName: String,
 
-	# Middle name of the contact.
+	# Initials or Middle name of the contact.
 	middleName: String,
 
 	# Last name of the contact.
 	lastName: String,
 
-	# Contact rank
+	# Contact maiden name
+	maidenName: String,
+
+	# Suffix. ex: jr
+	suffix: String,
+
+	# Contact rank. (iA profiles only)
 	rank: String,
+
+	# Is the contact deceased
+	isDeceased: Boolean!,
 
 	# Decease date of the contact.
 	deceaseDate: Date,
 
 	# API DEV: If smoker is null, assume false
 
-	# True if the contact is a smoker. (finance only)
-	smoker: Boolean!,
+	# True if the contact is a smoker.
+	isSmoker: Boolean!,
 
-	# Initial date when the contact is no longer considered a smoker. (finance only)
+	# Initial date when the contact is no longer considered a smoker.
 	smokerEndDate: Date,
 
 	# API DEV: In marital_status table, must do a TOP 1 query to fetch it, and it can be NULL
@@ -558,28 +522,15 @@ type IndividualContact implements Node, Contact {
 
 	# API DEV: Segments must be fetched with vd_seg# and vdvalues
 
-	# Segments 1-6. Translated values. (finance only)
-	seg1: FieldValue,
-	seg2: FieldValue,
-	seg3: FieldValue,
-	seg4: FieldValue,
-	seg5: FieldValue,
-	seg6: FieldValue,
+	segmentation: ContactSegmentation,
 
-	# Translated territory name of the contact. (finance only)
-	territory: FieldValue,
-
-	# API DEV: Through fk_document_picture, it should be possible to fetch a public URL
-
-	# Picture URL of the contact.
-	picture: String,
+	# Picture of the contact.
+	picture: ContactPicture,
 
 	# API DEV: Parse vdvalue to return a Gender enum value
 
 	# Gender of the contact.
 	gender: Gender,
-
-	# API DEV: Fetch with vdvalues (vd_territory)
 
 	# Birth date of the contact.
 	birthDate: Date,
@@ -589,8 +540,8 @@ type IndividualContact implements Node, Contact {
 	# Client number.
 	clientNb: String,
 
-	# Mr., Ms., Mrs., etc.
-	greeting: FieldValue!,
+	# Greating or salutation to use at the end of a letter
+	greeting: String,
 
 	# List of websites for this contact.
 	websites: [Website!]!,
@@ -598,16 +549,6 @@ type IndividualContact implements Node, Contact {
 
 	# Contact type, form type in CRM
 	contactType: ContactType!,
-
-	# API DEV: Fetch with i_contact_class, it uses vdvalues too
-
-	# Contact categories/classes.
-	categories: [FieldValue],
-
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
-	# Contact origins.
-	referredBy: [FieldValue],
 
 	# Addresses of the contact.
 	addresses: [Address],
@@ -636,52 +577,14 @@ type IndividualContact implements Node, Contact {
 	# Date the record was modified
 	lastUpdateDate: Date,
 
-	# API DEV : IA Only. Leave blank for others
-
-	# Contact rank.
-	rank: String,
-
-	# API DEV: Fetch with i_contact_gsend, it uses vdvalues too
-
-	# Contact distribution lists
-	distributionLists: [FieldValue],
-
 	# Notes for the contact.
 	notes: String,
 
-	# initials of the contact.
-	initials: String,
+	# Additional informational notes / peculiarity
+	additionnalInformations: String,
 }
 
-# Defines a basic individual contact.
-input BaseIndividualContact {
-    # First name of the contact.
-    firstName: String!,
 
-    # Last name of the contact.
-    lastName: String!,
-
-    # Middle name of the contact.
-    middleName: String,
-
-	# Contact rank.
-	rank: String,
-
-    # True if contact is a smoker.
-    smoker: Boolean,
-
-    # Date when smoker status ended.
-    smokerEndDate: Date,
-
-    # Gender.
-    gender: Gender,
-
-    # Birthdate.
-    birthDate: Date,
-
-    # Client number.
-    clientNb: String
-}
 
 type CivilStatus {
     # Civil status ID.
@@ -1098,21 +1001,13 @@ type InsuranceInsured {
 	insuranceClass: String,
 
 	# True if the insured client is a smoker.
-	smoker: Boolean
+	isSmoker: Boolean
 }
 
 type Website implements Node {
 	# Unique numerical identifier for the website.
 	id: ID!,
 
-	# Website's URL.
-	url: String!,
-
-	# True if the website is the main one specified.
-	isMain: Boolean!
-}
-
-input BaseWebsite {
 	# Website's URL.
 	url: String!,
 
@@ -1188,7 +1083,59 @@ type Query {
 # Mutation types
 type Mutation {
 
-    # ToDo: Remove job create, update, delete when the samples are no longer necessary.
+	# Create an Individual contact
+	createIndividualContact(input: CreateIndividualContactInput!): CreateIndividualContactPayload,
+
+	# Update an individual contact
+	updateIndividualContact(input: UpdateIndividualContactInput!) : UpdateIndividualContactPayload,
+
+	# Create an organization Contact
+	createOrganizationContact(input: CreateOrganizationContactInput!): CreateOrganizationContactPayload,
+
+	# Update an organization contact
+	updateOrganizationContact(input: UpdateOrganizationContactInput!) : UpdateOrganizationContactPayload,
+
+	# Adds an address for the given contact.
+	addToContactAddresses(input: AddToContactAddressesInput!): AddToContactAddressesPayload,
+
+	# Link an existing address to a contact. (phase 2)
+	# addExistingAddressToContactAddresses(input: LinkAddressToContactInput!): LinkAddressToContactPayload
+
+	# Remove an adress from the given contact. The address will be deleted if not linked to another contact
+	removeFromContactAddresses(input: RemoveFromContactAddressesInput!): RemoveFromContactAddressesPayload,
+
+	# Adds an address for the given contact.
+	addToContactPhones(input: AddToContactPhonesInput!): AddToContactPhonesPayload,
+
+	# Remove a phone for the given contact.
+	removeFromContactPhones(input: RemoveFromContactPhonesInput!): RemoveFromContactPhonesPayload,
+
+	# Adds an address for the given contact.
+	addToContactEmails(input: AddToContactEmailsInput!): AddToContactEmailsPayload,
+
+	# Remove a email for the given contact.
+	removeFromContactEmails(input: RemoveFromContactEmailsInput!): RemoveFromContactEmailsPayload,
+
+	# Adds an address for the given contact.
+	addToContactWebsites(input: AddToContactWebsitesInput!): AddToContactWebsitesPayload,
+
+	# Remove a website for the given contact.
+	removeFromContactWebsites(input: RemoveFromContactWebsitesInput!): RemoveFromContactWebsitesPayload,
+
+	# Segmentation
+
+	# Job
+
+	deleteContact(input: DeleteContactInput!): DeleteContactPayload,
+
+	#####
+
+	# TODO Event Add/Update/Delete/trf en réalisé
+	# TODO Task Add/Update/Delete/trf en réalisé
+
+
+	######################## DEPRECATED
+
 	# Creates a new Job.
 	createJob(job: BaseJob!): Job!,
 
@@ -1197,15 +1144,6 @@ type Mutation {
 
 	# Deletes job.
 	deleteJob(id: ID!): Boolean!,
-
-	# Creates a new individual contact.
-	addIndividualContact(contact: BaseIndividualContact!): IndividualContact,
-
-	# Updates an individual contact base info.
-	updateIndividualContact(contactId: ID!, contact: BaseIndividualContact!): IndividualContact,
-
-	# Deletes an individual contact.
-	deleteIndividualContact(contactId: ID!): Boolean!,
 
 	# Sets an individual contact civil status.
     addIndividualContactCivilStatus(contactId: ID!, civilStatusId: ID, since: Date): IndividualContact,
@@ -1219,57 +1157,453 @@ type Mutation {
     # Deletes an individual contact job.
     deleteIndividualContactJob(contactId: ID!, jobId: ID!): IndividualContact,
 
-    # Adds an individual contact hobby.
-    addIndividualContactHobby(contactId: ID!, hobbyId: ID!): IndividualContact,
-
-    # Deletes an individual contact hobby.
-    deleteIndividualContactHobby(contactId: ID!, hobbyId: ID!): IndividualContact,
-
-    # Sets a contact segment.
-	setContactSegment(contactId: ID!, segment: ContactSegment!, segmentId: ID): Contact,
-
-    # Sets a contact territory.
-    setContactTerritory(contactId: ID!, territoryId: ID!): Contact,
-
-    # Adds a contact category (class).
-    addContactCategory(contactId: ID!, categoryId: ID!): Contact,
-
-    # Deletes a contact category (class).
-    deleteContactCategory(contactId: ID!, categoryId: ID!): Contact,
-
-    # Adds a contact distribution list.
-    addContactDistributionList(contactId: ID!, distributionListId: ID!): Contact,
-
-    # Deletes a contact distribution list.
-    deleteContactDistributionList(contactId: ID!, distributionListId: ID!): Contact,
-
-    # Adds a contact industry.
-    addContactIndustry(contactId: ID!, industryId: ID!): Contact,
-
-    # Deletes a contact industry.
-    deleteContactIndustry(contactId: ID!, industryId: ID!): Contact,
-
-    # Adds an address for the given contact.
-    addContactAddress(contactId: ID!, address: BaseAddress!): Contact,
-
-    # Deletes an address for the given contact.
-    deleteContactAddress(contactId: ID!, addressId: ID!): Contact,
-
-    # Adds a phone number for the given contact.
-    addContactPhone(contactId: ID!, phoneId: BasePhone!): Contact,
-
-    # Deletes a phone number for the given contact.
-    deleteContactPhone(contactId: ID!, phoneId: ID!): Contact,
-
-    # Adds an email for the given contact.
-    addContactEmail(contactId: ID!, email: BaseEmail!): Contact,
-
-    # Deletes an email for the given contact.
-    deleteContactEmail(contactId: ID!, emailId: ID!): Contact,
-
-    # Adds an email for the given contact.
-    addContactWebsite(contactId: ID!, website: BaseWebsite!): Contact,
-
-    # Deletes an email for the given contact.
-    deleteContactWebsite(contactId: ID!, websiteId: ID!): Contact
 }
+
+input CreateIndividualContactInput {
+
+	# TODO: segmenter ou non identificaiton et info additionnel. C'est recommandé de faire de petit bloc pour évolution plus facile.
+
+	identification: CreateIndividualContactIdentificationInput,
+
+	additionalInfo: IndividualContactAdditionalInfoInput,
+
+	segmentation: ContactSegmentationInput,
+
+	# Notes for the contact.
+	notes: String,
+
+	# Additional informational notes / peculiarity
+	additionnalInformations: String,
+
+}
+
+type CreateIndividualContactPayload {
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Data of the created Contact
+	contact: IndividualContact
+}
+
+input CreateIndividualContactIdentificationInput {
+
+	# Title / Prefix / Civility of the contact. FieldValue ID.
+	titleId: ID,
+
+	# Gender.
+	gender: Gender!,
+
+	# First name of the contact.
+	firstName: String!,
+
+	# Initials or Middle name of the contact.
+	middleName: String,
+
+	# Last name of the contact.
+	lastName: String!,
+
+	# Contact maiden name
+	maidenName: String,
+
+	# Suffix. ex: jr
+	suffix: String,
+
+	# Greating or salutation to use at the end of a letter
+	greeting: String,
+
+	# Client number.
+	clientNb: String,
+
+	# Contact rank.  (iA profiles only)
+	rank: String
+}
+
+input IndividualContactAdditionalInfoInput {
+
+	# True if contact is a smoker.
+	isSmoker: Boolean,
+
+	# Date when smoker status ended.
+	smokerEndDate: Date,
+
+	# Birthdate.
+	birthDate: Date,
+
+	# Date of death.
+	dateOfDeath: Date,
+
+}
+
+input UpdateIndividualContactInput {
+
+	contactId: ID!
+
+	# ou patch ? TODO
+	identification: UpdateIndividualContactIdentificationInput,
+
+	# Notes for the contact.
+	notes: String,
+
+	# Additional informational notes / peculiarity
+	additionnalInformations: String,
+
+}
+
+type UpdateIndividualContactPayload {
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Data of the updated Contact
+	contact: IndividualContact
+}
+
+input UpdateIndividualContactIdentificationInput {
+	# Title of the contact. FieldValue ID.
+	titleId: ID,
+
+	# Gender.
+	gender: Gender,
+
+	# First name of the contact.
+	firstName: String,
+
+	# Initials or Middle name of the contact.
+	middleName: String,
+
+	# Last name of the contact.
+	lastName: String,
+
+	# Contact maiden name
+	maidenName: String,
+
+	# Suffix. ex: jr
+	suffix: String,
+
+	# Greating or salutation to use at the end of a letter
+	greeting: String,
+
+	# Client number.
+	clientNb: String,
+
+	# Contact rank.  (iA profiles only)
+	rank: String
+
+}
+
+input CreateOrganizationContactInput {
+
+	identification: CreateOrganizationContactIdentificationInput,
+
+	#segmentation: ContactSegmentationInput,
+
+}
+
+type CreateOrganizationContactPayload {
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Data of the created Contact
+	contact: OrganizationContact
+}
+
+input CreateOrganizationContactIdentificationInput {
+
+	# Organization abbreviation
+	abbreviation: String!,
+
+	# Corporation/organization name.
+	corporationName: String!,
+
+	# Corporation/organization second line.
+	corporationNameLine2: String,
+
+	# initials of the contact.
+	initials: String,
+
+	# Client number.
+	clientNb: String,
+}
+
+input UpdateOrganizationContactInput {
+
+	contactId: ID,
+
+	identification: UpdateOrganizationContactIdentificationInput,
+
+}
+
+type UpdateOrganizationContactPayload {
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Data of the updated Contact
+	contact: OrganizationContact
+}
+
+input UpdateOrganizationContactIdentificationInput {
+
+	# Organization abbreviation
+	abbreviation: String,
+
+	# Corporation/organization name.
+	corporationName: String,
+
+	# Corporation/organization second line.
+	corporationNameLine2: String,
+
+	# initials of the contact.
+	initials: String,
+
+	# Client number.
+	clientNb: String,
+}
+
+input ContactSegmentationInput {
+
+	# Contact categories/classes.
+	categoryIds: [ID!] @fieldValueId(type: "CONTACT_CATEGORY"),
+
+	# Contact distribution lists.
+	distributionListIds: [ID!] @fieldValueId(type: "CONTACT_DISTRIBUTION_LISTS"),
+
+	# Contact origins.
+	referredByIds: [ID!] @fieldValueId(type: "CONTACT_REFERRED_BY"),
+
+	# Segments 1.
+	seg1Id: ID @fieldValueId(type: "CONTACT_SEGMENT_1"),
+
+	# Segments 2.
+	seg2Id: ID @fieldValueId(type: "CONTACT_SEGMENT_2"),
+
+	# Segments 3.
+	seg3Id: ID @fieldValueId(type: "CONTACT_SEGMENT_3"),
+
+	# Segments 4.
+	seg4Id: ID @fieldValueId(type: "CONTACT_SEGMENT_4"),
+
+	# Segments 5.
+	seg5Id: ID @fieldValueId(type: "CONTACT_SEGMENT_5"),
+
+	# Segments 6.
+	seg6Id: ID @fieldValueId(type: "CONTACT_SEGMENT_6"),
+
+	# Translated territory name of the contact.
+	territoryId: ID @fieldValueId(type: "CONTACT_TERRITORY"),
+
+}
+
+
+input AddToContactAddressesInput {
+	contactId: ID!,
+
+	# True if this is considered as a main address.
+	isMain: Boolean,
+
+	# True if this is considered as a postal address.
+	isPostal: Boolean,
+
+	# Address details
+	address: CreateAddressInput!
+}
+
+type AddToContactAddressesPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Contact the address was created for
+	contact: Contact,
+
+	# Created address
+	address: Address,
+
+}
+
+input CreateAddressInput {
+
+	# Type of the address.
+	typeId: ID! @fieldValueId(type: "ADDRESS_TYPE"),
+
+	# First line of the address.
+	line1: String!,
+
+	# Second line of the address.
+	line2: String,
+
+	# State or province of the address.
+	stateProvince: String,
+
+	# Country of the address.
+	country: String,
+
+	# Postal/zip code of the address.
+	postalCode: String,
+
+	# Date which the address became active.
+	dateSince: Date,
+
+	# City of the address.
+	city: String
+}
+
+input RemoveFromContactAddressesInput {
+
+	# Id of the contact to remove address from
+	contactId: ID!,
+
+	# Id of the address to delete
+	addressId: ID!,
+}
+
+type RemoveFromContactAddressesPayload {
+
+	# Contact the address was removed from
+	contact: Contact,
+}
+
+
+input AddToContactPhonesInput {
+	contactId: ID!,
+
+	# True if this is considered a main phone number.
+	isMain: Boolean,
+
+	# Phone details
+	phone: PhoneInput!
+}
+
+type AddToContactPhonesPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Contact the address was created for
+	contact: Contact,
+
+	# Created phone
+	phone: Phone,
+
+}
+
+# Representation of a phone entity used for inputting new phone numbers.
+input CreatePhoneInput {
+
+	# Type of the phone number.
+	typeId: ID! @fieldValueId(type: "PHONE_TYPE"),
+
+	# Actual phone number. The extension is included in it.
+	number: String!,
+
+	# Phone number's extension.
+	extension: String,
+
+	# True if the phone number number is considered long distance.
+	longDistance: Boolean,
+
+	# Notes of the phone number.
+	notes: String
+
+}
+
+input RemoveFromContactPhonesInput {
+
+	# Id of the contact to remove address from
+	contactId: ID!,
+
+	# Id of the address to delete
+	phoneId: ID!,
+}
+
+type RemoveFromContactPhonesPayload {
+
+	# Contact the address was removed from
+	contact: Contact,
+}
+
+input AddToContactEmailsInput {
+	contactId: ID!,
+
+	# True if this is considered a main email address.
+	isMain: Boolean,
+
+	# Email details
+	email: CreateEmailInput!
+}
+
+type AddToContactEmailsPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Contact the email address was created for
+	contact: Contact,
+
+	# Created phone
+	email: Email,
+
+}
+
+input CreateEmailInput {
+
+	# Type of the email address.
+	typeId: ID! @fieldValueId(type: "EMAIL_TYPE"),
+
+	# Actual email address.
+	email: String!,
+
+	# Notes of the email address.
+	notes: String
+}
+
+type RemoveFromContactEmailsPayload {
+
+	# Contact the email was removed from
+	contact: Contact,
+}
+
+
+input AddToContactWebsitesInput {
+	contactId: ID!,
+
+	# True if this is considered a main website url.
+	isMain: Boolean,
+
+	# Websitedetails
+	website: CreateWebsiteInput!
+}
+
+type AddToContactWebsitesPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Contact the email address was created for
+	contact: Contact,
+
+	# Created phone
+	website: Website,
+
+}
+
+input CreateWebsiteInput {
+
+	# Website's URL.
+	url: String!,
+
+}
+
+type RemoveFromContactWebsitesPayload {
+
+	# Contact the website was removed from
+	contact: Contact,
+}
+
+input DeleteContactInput {
+
+	# Id of the contact to delete
+	contactId: ID!,
+}
+
+type DeleteContactPayload {
+}
+

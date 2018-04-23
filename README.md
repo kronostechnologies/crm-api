@@ -5,10 +5,17 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 
 ## Changelogs (most recent to oldest)
 
-### 2018-04-22
+### 2018-04-
 
 * Updated documentation for `initials` field on `Contact` type. It is not generated.
-* Mutations are a work in progress.
+* Changed the type of `greeting` field to `String`
+* Add `isDeceased` field
+* Changed the type of `picture` from `String` to `ContactPicture` to allow future extension.
+* Add `additionnalInformations` to `Contact` for "peculiarities".
+* Rename `smoker` field by `isSmoker`
+* Regroup segmentation fields into `ContactSegmentation` type. `categories`, `distributionLists`, `referredBy`, `seg1`, `seg2`,..., `territory`
+* Rename `main` by `isMain`
+* Rename `postal` by `isPostal`
 
 ### 2018-04-20
 
