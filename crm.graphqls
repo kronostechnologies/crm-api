@@ -1819,7 +1819,7 @@ input UpdateWebsiteInput {
 
 }
 
-type UpdateEmailPayload {
+type UpdateWebsitePayload {
 
 	# Mutation ID initially provided to the input mutation, or null if not provided.
 	clientMutationId: String,
