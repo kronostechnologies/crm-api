@@ -1084,6 +1084,9 @@ type Query {
 # Mutation types
 type Mutation {
 
+	###############
+	## Contact
+
 	# Create an Individual contact
 	createIndividualContact(input: CreateIndividualContactInput!): CreateIndividualContactPayload,
 
@@ -1120,7 +1123,11 @@ type Mutation {
 	# Remove a phone for the given contact.
 	removeFromContactPhones(input: RemoveFromContactPhonesInput!): RemoveFromContactPhonesPayload,
 
-	# TODO: updatePhone()
+	# Update an existing phone
+	updatePhone(input: UpdatePhoneInput!): UpdatePhonePayload,
+
+	# Select the main phone to use for a contact
+	setContactMainPhone(input: SetContactMainPhoneInput!): SetContactMainPhonePayload,
 
 	# Adds an address for the given contact.
 	addToContactEmails(input: AddToContactEmailsInput!): AddToContactEmailsPayload,
@@ -1128,7 +1135,11 @@ type Mutation {
 	# Remove a email for the given contact.
 	removeFromContactEmails(input: RemoveFromContactEmailsInput!): RemoveFromContactEmailsPayload,
 
-	# TODO: updateEmail()
+	# Update an existing email
+	updateEmail(input: UpdateEmailInput!): UpdateEmailPayload,
+
+	# Select the main email to use for a contact
+	setContactMainEmail(input: SetContactMainEmailInput!): SetContactMainEmailPayload,
 
 	# Adds an address for the given contact.
 	addToContactWebsites(input: AddToContactWebsitesInput!): AddToContactWebsitesPayload,
@@ -1136,7 +1147,8 @@ type Mutation {
 	# Remove a website for the given contact.
 	removeFromContactWebsites(input: RemoveFromContactWebsitesInput!): RemoveFromContactWebsitesPayload,
 
-	# TODO: updateWebsite()
+	# Update an existing website
+	updateWebsite(input: UpdateWebsiteInput!): UpdateWebsitePayload,
 
 	# TODO phase ultérieur : addToContactOccupations().
 	# TODO phase ultérieur : removeFromContactOccupations()
@@ -1157,7 +1169,14 @@ type Mutation {
 	deleteContact(input: DeleteContactInput!): DeleteContactPayload,
 
 
+	###############
+	## Event
+
 	# TODO Event Add/Update/Delete/trf en réalisé
+
+	###############
+	## Task
+
 	# TODO Task Add/Update/Delete/trf en réalisé
 }
 
@@ -1177,16 +1196,16 @@ input CreateIndividualContactInput {
 	occupations: [OccupationInput!],
 
 	# Create Address for the contact
-	addresses: [CreateAddressInput!],
+	# addresses: [CreateAddressInput!], # TODO: Est-vraiment utile ou addToContactAddresses() est suffisant
 
 	# Create Phone for the contact
-	phones: [CreatePhoneInput!],
+	# phones: [CreatePhoneInput!], # TODO: Est-vraiment utile ou addToContactPhones() est suffisant
 
 	# Create email for the contact
-	emails: [CreateEmailInput!],
+	# emails: [CreateEmailInput!], # TODO: Est-vraiment utile ou addToContactEmails() est suffisant
 
 	# Create Website for the contact
-	websites: [CreateWebsiteInput!],
+	# websites: [CreateWebsiteInput!], # TODO: Est-vraiment utile ou addToContactWebsites() est suffisant
 
 	# Notes for the contact.
 	notes: String,
@@ -1482,7 +1501,7 @@ input SetContactMainAddressInput {
 	# Id of the contac to update the address for.
 	contactId: ID!,
 
-	# Address id
+	# Address id to use as main address id
 	addressId: ID!
 }
 
@@ -1500,7 +1519,7 @@ input SetContactPostalAddressInput {
 	# Id of the contac to update the address for.
 	contactId: ID!,
 
-	# Address id
+	# Address id to use as postal address
 	addressId: ID!
 }
 
@@ -1527,6 +1546,9 @@ input UpdateAddressInput {
 	# Second line of the address.
 	line2: String,
 
+	# City of the address.
+	city: String,
+
 	# State or province of the address.
 	stateProvince: String,
 
@@ -1539,8 +1561,6 @@ input UpdateAddressInput {
 	# Date which the address became active.
 	dateSince: Date,
 
-	# City of the address.
-	city: String
 
 }
 
@@ -1577,7 +1597,7 @@ input AddToContactPhonesInput {
 	isMain: Boolean,
 
 	# Phone details
-	phone: PhoneInput!
+	phone: CreatePhoneInput!
 }
 
 type AddToContactPhonesPayload {
@@ -1613,6 +1633,24 @@ input CreatePhoneInput {
 
 }
 
+input SetContactMainPhoneInput {
+
+	# Id of the contact to update the phone for.
+	contactId: ID!,
+
+	# Phone id to use as main phone
+	phoneId: ID!
+}
+
+type SetContactMainPhonePayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Contact the phone was updated for
+	contact: Contact,
+}
+
 input RemoveFromContactPhonesInput {
 
 	# Id of the contact to remove address from
@@ -1626,6 +1664,33 @@ type RemoveFromContactPhonesPayload {
 
 	# Contact the address was removed from
 	contact: Contact,
+}
+
+input UpdatePhoneInput {
+	# Type of the phone number.
+	typeId: ID @fieldValueId(type: "PHONE_TYPE"),
+
+	# Actual phone number. The extension is included in it.
+	number: String!,
+
+	# Phone number's extension.
+	extension: String,
+
+	# True if the phone number number is considered long distance.
+	longDistance: Boolean,
+
+	# Notes of the phone number.
+	notes: String
+}
+
+type UpdatePhonePayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# The updated phone
+	phone: Phone
+
 }
 
 input AddToContactEmailsInput {
@@ -1669,6 +1734,44 @@ type RemoveFromContactEmailsPayload {
 	contact: Contact,
 }
 
+input UpdateEmailInput {
+	# Type of the email address.
+	typeId: ID @fieldValueId(type: "EMAIL_TYPE"),
+
+	# Actual email address.
+	email: String!,
+
+	# Notes of the email address.
+	notes: String
+}
+
+type UpdateEmailPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# The updated email
+	email: Email
+
+}
+
+input SetContactMainEmailInput {
+
+	# Id of the contact to update the phone for.
+	contactId: ID!,
+
+	# Email id to use as main email
+	emailId: ID!
+}
+
+type SetContactMainEmailPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# Contact the email was updated for
+	contact: Contact,
+}
 
 input AddToContactWebsitesInput {
 	contactId: ID!,
@@ -1704,6 +1807,28 @@ type RemoveFromContactWebsitesPayload {
 
 	# Contact the website was removed from
 	contact: Contact,
+}
+
+input UpdateWebsiteInput {
+
+	# Id of the website to update
+	websiteId: ID!,
+
+	# Website's URL.
+	url: String!
+
+}
+
+type UpdateEmailPayload {
+
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
+
+	# The updated email
+	email: Email
+
+	# Website's URL.
+	url: String!,
 }
 
 
