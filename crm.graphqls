@@ -126,16 +126,15 @@ enum SortOrder {
 
 
 
-# Interfaces
+
+# Types
+
 
 # Defines a node with an ID.
 interface Node {
 	# Unique identifier for the node.
 	id: ID!
 }
-
-
-# Types
 
 # Page information answer from the server.
 type PageInfo {
@@ -397,22 +396,22 @@ interface Contact {
 	contactType: ContactType!,
 
 	# Display name of the contact.
-	displayName: String,
+	displayName: String!,
 
 	# Picture of the contact.
 	picture: ContactPicture,
 
 	# Regroup contact segmentation informations
-	segmentation: ContactSegmentation,
+	segmentation: ContactSegmentation!,
 
 	# Addresses of the contact.
-	addresses: [Address],
+	addresses: [Address!]!,
 
 	# Phone numbers of the contact.
-	phones: [Phone],
+	phones: [Phone!]!,
 
 	# Emails of the contact.
-	emails: [Email],
+	emails: [Email!]!,
 
 	# List of websites for this contact.
 	websites: [Website!]!,
@@ -468,13 +467,13 @@ type OrganizationContact implements Node, Contact {
 	segmentation: ContactSegmentation,
 
 	# Addresses of the contact.
-	addresses: [Address],
+	addresses: [Address!]!,
 
 	# Phone numbers of the contact.
-	phones: [Phone],
+	phones: [Phone!]!,
 
 	# Emails of the contact.
-	emails: [Email],
+	emails: [Email!]!,
 
 	# List of websites for this contact.
 	websites: [Website!]!,
@@ -508,6 +507,11 @@ type IndividualContact implements Node, Contact {
 	#Title / Prefix / Civility of the contact. FieldValue ID.
 	title: FieldValue,
 
+	# API DEV: Parse vdvalue to return a Gender enum value
+
+	# Gender of the contact.
+	gender: Gender,
+
 	# First name of the contact.
 	firstName: String,
 
@@ -523,8 +527,16 @@ type IndividualContact implements Node, Contact {
 	# Suffix. ex: jr
 	suffix: String,
 
+	# Greating or salutation to use at the end of a letter
+	greeting: String,
+
 	# Contact rank. (iA profiles only)
 	rank: String,
+
+	# DEV: identification_customer_no
+
+	# Client number.
+	clientNb: String,
 
 	# Is the contact deceased
 	isDeceased: Boolean!,
@@ -557,26 +569,10 @@ type IndividualContact implements Node, Contact {
 	occupations: [Occupation!]!,
 
 	# Regroup segmentation fields
-	segmentation: ContactSegmentation,
-
-	# API DEV: Parse vdvalue to return a Gender enum value
-
-	# Gender of the contact.
-	gender: Gender,
+	segmentation: ContactSegmentation!,
 
 	# Birth date of the contact.
 	birthDate: Date,
-
-	# DEV: identification_customer_no
-
-	# Client number.
-	clientNb: String,
-
-	# Greating or salutation to use at the end of a letter
-	greeting: String,
-
-	# List of websites for this contact.
-	websites: [Website!]!,
 
 	# Contact type, form type in CRM
 	contactType: ContactType!,
@@ -588,13 +584,16 @@ type IndividualContact implements Node, Contact {
 	picture: ContactPicture,
 
 	# Addresses of the contact.
-	addresses: [Address],
+	addresses: [Address!]!,
 
 	# Phone numbers of the contact.
-	phones: [Phone],
+	phones: [Phone!]!,
 
 	# Emails of the contact.
-	emails: [Email],
+	emails: [Email!]!,
+
+	# List of websites for this contact.
+	websites: [Website!]!,
 
 	# Events of the contact. Can be sorted.
 	events(first: Int, after: Cursor, from: Cursor, filters: EventListFilters!): EventConnection!,
