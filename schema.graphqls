@@ -88,6 +88,9 @@ type Mutation {
 	# Update current / last occupation of the contact
 	updateContactCurrentOccupation(input: UpdateContactCurrentOccupationInput!): UpdateContactCurrentOccupationPayload,
 
+	# Update current / last occupation of the contact
+	updateContactCurrentMaritalStatus(input: UpdateContactCurrentMaritalStatusInput!): UpdateContactCurrentMaritalStatusPayload,
+
 	# TODO phase ultérieur : addToContactOccupations().
 	# TODO phase ultérieur : removeFromContactOccupations()
 	# TODO phase ultérieur : addToContactMaritalStatuses().
@@ -466,17 +469,17 @@ type ContactPicture {
 }
 
 type MaritalStatus implements Node {
-	# Civil status ID.
+	# Marital status ID.
 	id: ID!,
 
-	# Date when the civil status starts.
+	# Date when the marital status starts.
 	startDate: Date,
 
-	# Date when the civil status ends.
+	# Date when the marital status ends.
 	endDate: Date,
 
-	# Civil status value.
-	status: FieldValue!
+	# Marital status value.
+	status: FieldValue! @fieldValue(name: "MARITAL_STATUS")
 }
 
 type ContactSegmentation {
@@ -1866,6 +1869,25 @@ input OccupationInput {
 
 	# Employer name.
 	employer: String
+}
+
+input UpdateContactCurrentMaritalStatusInput {
+
+	# Id of the contact to update
+	contactId: ID!,
+
+	maritalStatus: MaritalStatusInput
+
+}
+
+type UpdateContactCurrentMaritalStatusPayload {
+
+	# Updated contact
+	contact: IndividualContact!,
+
+	# updated marital status
+	maritalStatus: MaritalStatus!,
+
 }
 
 input MaritalStatusInput {
