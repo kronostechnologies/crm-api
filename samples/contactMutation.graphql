@@ -10,24 +10,26 @@ mutation CreateReviewForEpisode {
         },
         segmentation: {
             seg1Id: 222
-        },
-        addresses: [
-            {
-                clientMutationId: "ADDRESS-ID-1",
-                typeId: 1,
-                line1: "123 de la rue"
-            }
-        ]
+        }
     }){
         contact {
             id
         }
     }
 
+    addToContactAddresses(input:{
+        contactId: 111,
+        isMain: true,
+        address: {
+            typeId: 1,
+            line1: "123 de la rue"
+        }
+    }){address { id }},
+
     setContactMainAddress(input:{
         contactId: 111
         addressId: 222
-    }){ clientMutationId }
+    }){ contact { id } }
 
     createOrganizationContact(input: {
         identification: {

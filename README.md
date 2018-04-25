@@ -23,6 +23,7 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 * Split `civilStatus into `currentMaritalStatus` and `maritalStatuses`
 * Regroup `notes` and `additionnalInformations` into `ContactNote` type
 * Delete `clientMutationId` will be added later if necessary
+* Regroup `creationDate` and `lastUpdateDate` in `status` field
 
 ### 2018-04-20
 

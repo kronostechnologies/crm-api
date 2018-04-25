@@ -18,6 +18,7 @@ type Query {
 }
 
 type Mutation {
+
 	###############
 	## Contact
 
@@ -170,10 +171,10 @@ enum Currency {
 
 # Field value type
 enum FieldValueType {
-	CLASS,
+	ADDRESS_CITY,
+	ADDRESS_COUNTRY,
 	ADDRESS_TYPE,
-	PHONE_TYPE,
-	MARITAL_STATUS,
+	CONTACT_TITLE,
 	CONTACT_CATEGORY,
 	CONTACT_DISTRIBUTION_LISTS,
 	CONTACT_REFERRED_BY,
@@ -186,9 +187,9 @@ enum FieldValueType {
 	CONTACT_SEGMENT_4,
 	CONTACT_SEGMENT_5,
 	CONTACT_SEGMENT_6,
-	ADDRESS_COUNTRY,
-	ADDRESS_CITY,
-	EMAIL_TYPE
+	EMAIL_TYPE,
+	MARITAL_STATUS,
+	PHONE_TYPE
 }
 
 # Gender
@@ -278,6 +279,30 @@ type FieldValue implements Node {
 	# DEV: Équivalent du system_name mais hard-coded pour API
 	# Unique system code. Prefer using this for identification rather than id.
 	code: String
+}
+
+type ContactStatus {
+	# Date the record was modified
+	creationDate: Date,
+
+	# Date the record was modified
+	lastUpdateDate: Date,
+}
+
+type EventStatus {
+	# Date the record was modified
+	creationDate: Date,
+
+	# Date the record was modified
+	lastUpdateDate: Date,
+}
+
+type TaskStatus {
+	# Date the record was modified
+	creationDate: Date,
+
+	# Date the record was modified
+	lastUpdateDate: Date,
 }
 
 # User entity.
@@ -505,10 +530,13 @@ type ContactNotes {
 	notes: String,
 
 	# Additional informational notes / peculiarity
-	additionnalInformations: String,
+	additionalInformations: String,
 }
 
 interface Contact {
+
+	# Unique identifier
+	id: ID!,
 
 	# Contact type, form type in CRM
 	contactType: ContactType!,
@@ -546,19 +574,14 @@ interface Contact {
 	# Insurance policies of the contact.
 	policies: [InsurancePolicy!]!,
 
-	# Notes and Additionnal informations notes for the contact.
+	# Notes and Additional informations notes for the contact.
 	notes: ContactNotes!,
 
-	# Date the record was modified
-	creationDate: Date,
-
-	# Date the record was modified
-	lastUpdateDate: Date,
+	# Status informations like creationDate
+	status: ContactStatus!,
 }
 
-type OrganizationContact implements Node, Contact {
-	# Unique numerical identifier of the contact.
-	id: ID!,
+type OrganizationContactIdentification {
 
 	# Organization abbreviation
 	abbreviation: String,
@@ -568,6 +591,17 @@ type OrganizationContact implements Node, Contact {
 
 	# Corporation/organization second line.
 	corporationNameLine2: String,
+
+	# initials of the contact.
+	initials: String,
+
+	# Client number.
+	clientNb: String,
+}
+
+type OrganizationContact implements Node, Contact {
+	# Unique numerical identifier of the contact.
+	id: ID!,
 
 	# Contact type, form type in CRM
 	contactType: ContactType!,
@@ -605,24 +639,17 @@ type OrganizationContact implements Node, Contact {
 	# Insurance policies of the contact.
 	policies: [InsurancePolicy!]!,
 
-	# Notes and Additionnal informations notes for the contact.
+	# Notes and Additional informations notes for the contact.
 	notes: ContactNotes!,
 
-	# Date the record was modified
-	creationDate: Date,
-
-	# Date the record was modified
-	lastUpdateDate: Date,
+	# Status informations like creationDate
+	status: ContactStatus!,
 }
 
-type IndividualContact implements Node, Contact {
-	# Unique numerical identifier of the contact.
-	id: ID!,
+type IndividualContactIdentification {
 
-	#Title / Prefix / Civility of the contact. FieldValue ID.
-	title: FieldValue,
-
-	# API DEV: Parse vdvalue to return a Gender enum value
+	#Title / Prefix / Civility of the contact.
+	title: FieldValue @fieldValue(name: "CONTACT_TITLE"),
 
 	# Gender of the contact.
 	gender: Gender,
@@ -652,6 +679,9 @@ type IndividualContact implements Node, Contact {
 
 	# Client number.
 	clientNb: String,
+}
+
+type IndividualContactAdditionalInformation {
 
 	# Is the contact deceased
 	isDeceased: Boolean!,
@@ -667,13 +697,27 @@ type IndividualContact implements Node, Contact {
 	# Initial date when the contact is no longer considered a smoker.
 	smokerEndDate: Date,
 
+	# Birth date of the contact.
+	birthDate: Date,
+}
+
+type IndividualContact implements Node, Contact {
+	# Unique numerical identifier of the contact.
+	id: ID!,
+
+	# Contact identification
+	identification: IndividualContactIdentification!,
+
+	# Contact additional informations
+	additionalInformation: IndividualContactAdditionalInformation!,
+
 	# API DEV: In marital_status table, must do a TOP 1 query to fetch it, and it can be NULL
 
 	# Current marital status of the contact.
 	currentMaritalStatus: MaritalStatus,
 
 	# List of current and past marital statuses
-	maritalStatuses: [MaritalStatus!]!,
+	# maritalStatuses: [MaritalStatus!]!, # TODO Phase ultérieur
 
 	# API DEV: 1-1 relationship with job table from contacts
 
@@ -681,13 +725,10 @@ type IndividualContact implements Node, Contact {
 	currentOccupation: Occupation,
 
 	# List of all occupations / job for the contact.
-	occupations: [Occupation!]!,
+	# occupations: [Occupation!]!, # TODO Phase ultérieur
 
 	# Regroup segmentation fields
 	segmentation: ContactSegmentation!,
-
-	# Birth date of the contact.
-	birthDate: Date,
 
 	# Contact type, form type in CRM
 	contactType: ContactType!,
@@ -722,14 +763,11 @@ type IndividualContact implements Node, Contact {
 	# Insurance policies of the contact.
 	policies: [InsurancePolicy!]!,
 
-	# Notes and Additionnal informations notes for the contact.
+	# Notes and Additional informations notes for the contact.
 	notes: ContactNotes!,
 
-	# Date the record was modified
-	creationDate: Date,
-
-	# Date the record was modified
-	lastUpdateDate: Date
+	# Status informations like creationDate
+	status: ContactStatus!,
 }
 
 
@@ -820,11 +858,8 @@ type Event implements Node {
 	# Internal notes on the event.
 	internalNotes: String,
 
-	# Date the record was created.
-	creationDate: Date,
-
-	# Date the record was modified.
-	lastUpdateDate: Date
+	# Status informations like creationDate
+	status: EventStatus!,
 }
 
 # Defines an event edge (entry), used for pagination.
@@ -917,11 +952,8 @@ type Task implements Node {
 	# Internal notes on the task.
 	internalNotes: String,
 
-	# Date the record was created.
-	creationDate: Date,
-
-	# Date the record was modified.
-	lastUpdateDate: Date
+	# Status informations like creationDate
+	status: TaskStatus!,
 }
 
 # Defines a task edge (entry), used for pagination.
@@ -1183,28 +1215,13 @@ input CreateIndividualContactInput {
 	# Regroup identification fields for the contact
 	identification: CreateIndividualContactIdentificationInput!,
 
-	# Regroup additionnal fields
-	additionalInfo: IndividualContactAdditionalInfoInput,
+	# Regroup additional fields
+	additionalInformation: CreateIndividualContactIdentificationInput,
 
 	# Regroup segmentation fields
 	segmentation: ContactSegmentationInput,
 
-	# Contact occupation(s). currentOccupation will be computed.
-	occupations: [OccupationInput!],
-
-	# Create Address for the contact
-	addresses: [CreateAddressInput!],
-
-	# Create Phone for the contact
-	phones: [CreatePhoneInput!],
-
-	# Create email for the contact
-	emails: [CreateEmailInput!],
-
-	# Create Website for the contact
-	websites: [CreateWebsiteInput!],
-
-	# Notes and Additionnal informations notes for the contact.
+	# Notes and Additional informations notes for the contact.
 	notes: ContactNotesInput,
 
 }
@@ -1277,7 +1294,7 @@ input UpdateIndividualContactInput {
 	# Contact occupation(s). currentOccupation will be computed.
 	occupations: [OccupationInput!],
 
-	# Notes and Additionnal informations notes for the contact.
+	# Notes and Additional informations notes for the contact.
 	notes: ContactNotesInput
 
 }
@@ -1329,16 +1346,7 @@ input CreateOrganizationContactInput {
 	# Segmentation fields
 	segmentation: ContactSegmentationInput,
 
-	# Create Phone for the contact
-	phones: [CreatePhoneInput!],
-
-	# Create email for the contact
-	emails: [CreateEmailInput!],
-
-	# Create Website for the contact
-	websites: [CreateWebsiteInput!],
-
-	# Notes and Additionnal informations notes for the contact.
+	# Notes and Additional informations notes for the contact.
 	notes: ContactNotesInput
 
 }
@@ -1378,7 +1386,7 @@ input UpdateOrganizationContactInput {
 	# Segmentation fields
 	segmentation: ContactSegmentationInput,
 
-	# Notes and Additionnal informations notes for the contact.
+	# Notes and Additional informations notes for the contact.
 	notes: ContactNotesInput
 }
 
@@ -1408,13 +1416,13 @@ input UpdateOrganizationContactIdentificationInput {
 
 input ContactSegmentationInput {
 
-	# Contact categories/classes.
+	# Contact categories/classes. See addToContactCategories()
 	categoryIds: [ID!] @fieldValueId(type: "CONTACT_CATEGORY"),
 
-	# Contact distribution lists.
+	# Contact distribution lists. See addToContactDistributionLists()
 	distributionListIds: [ID!] @fieldValueId(type: "CONTACT_DISTRIBUTION_LISTS"),
 
-	# Contact origins.
+	# Contact origins. See addToContactReferredByLists()
 	referredByIds: [ID!] @fieldValueId(type: "CONTACT_REFERRED_BY"),
 
 	# Segments 1.
@@ -1445,7 +1453,7 @@ input ContactNotesInput {
 	notes: String,
 
 	# Additional informational notes / peculiarity
-	additionnalInformations: String
+	additionalInformations: String
 }
 
 input AddToContactAddressesInput {
