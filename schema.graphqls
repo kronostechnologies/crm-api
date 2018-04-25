@@ -91,6 +91,9 @@ type Mutation {
 	# Update current / last occupation of the contact
 	updateContactCurrentMaritalStatus(input: UpdateContactCurrentMaritalStatusInput!): UpdateContactCurrentMaritalStatusPayload,
 
+	# Delete a contact
+	deleteContact(input: DeleteContactInput!): DeleteContactPayload,
+
 	# TODO phase ultérieur : addToContactOccupations().
 	# TODO phase ultérieur : removeFromContactOccupations()
 	# TODO phase ultérieur : addToContactMaritalStatuses().
@@ -105,9 +108,6 @@ type Mutation {
 	# TODO phase ultérieur : removeFromContactIndustries()
 	# TODO phase ultérieur : addToContactHobbies()
 	# TODO phase ultérieur : removeFromContactHobbies()
-
-
-	deleteContact(input: DeleteContactInput!): DeleteContactPayload,
 
 
 	###############
@@ -819,12 +819,15 @@ type Event implements Node {
 	# True if the event lasts all day.
 	allDay: Boolean!,
 
+	# TODO idée google start{startDate,startDateTime, timezone}
+	# TODO idée TimedEvent vs AllDayEvent vs RecurringEvent
+	# TODO: Idée notion de calendar de base
+
 	# Computed date & time when the event starts.
-	startDateTime: DateTime,
+	startDateTime: DateTime!,
 
 	# Computed date & time when the event ends.
-	endDateTime: DateTime,
-
+	endDateTime: DateTime!,
 
 	# Date the event was initially scheduled
 	initialDate: Date,
@@ -842,26 +845,31 @@ type Event implements Node {
 	priority: CalendarPriority!,
 
 	# Returns true if a reminder is setup.
-	hasReminder: Boolean!,
+	#hasReminder: Boolean!, # TODO: Phase ultérieur
 
 	# Reminder delay in minutes.
-	reminderDelay: Int,
+	#reminderDelay: Int, # TODO: Phase ultérieur
+
+	# TODO: idée google a l'option singleEvents(false par défaut) qui compute les récurrence
+
 
 	# The recurrence rule for this event. The recurrence is a string conform to RFC 5545 (see RRULE http://tools.ietf.org/html/rfc5545#section-3.8.5.3).
-	recurrenceRule: String,
+	#recurrenceRule: String,
 
 	# The exception rule for this event. The exception is a string conform to RFC 5545 (see EXDATE http://tools.ietf.org/html/rfc5545#section-3.8.5.1).
-	exceptionRule: String,
+	# exceptionRule: String,
 
 	# The details of the exception that are described in the RFC5545 ExDate ($exception) string.
 	# These object will never have their exception and exception_detail filled: An exception cannot have a recurrence.
 	# Thus exceptions cannot have exceptions.
-	exceptions: [ExceptionEvent],
+	# exceptions: [ExceptionEvent],
 
 	# API DEV: Contained in action_notes table
 
 	# Description of the event.
 	description: String,
+
+	# TODO : resegmenter pour faire comme contact et bonus optimisation
 
 	# Internal notes on the event.
 	internalNotes: String,
