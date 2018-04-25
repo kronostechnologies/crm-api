@@ -85,6 +85,9 @@ type Mutation {
 	# Update an existing website
 	updateWebsite(input: UpdateWebsiteInput!): UpdateWebsitePayload,
 
+	# Update current / last occupation of the contact
+	updateContactCurrentOccupation(input: UpdateContactCurrentOccupationInput!): UpdateContactCurrentOccupationPayload,
+
 	# TODO phase ultérieur : addToContactOccupations().
 	# TODO phase ultérieur : removeFromContactOccupations()
 	# TODO phase ultérieur : addToContactMaritalStatuses().
@@ -580,6 +583,8 @@ interface Contact {
 	# Status informations like creationDate
 	status: ContactStatus!,
 }
+
+union ContactUnion = IndividualContact | OrganizationContact
 
 type OrganizationContactIdentification {
 
@@ -1291,9 +1296,6 @@ input UpdateIndividualContactInput {
 	# Segmentation fields
 	segmentation: ContactSegmentationInput,
 
-	# Contact occupation(s). currentOccupation will be computed.
-	occupations: [OccupationInput!],
-
 	# Notes and Additional informations notes for the contact.
 	notes: ContactNotesInput
 
@@ -1472,7 +1474,7 @@ input AddToContactAddressesInput {
 type AddToContactAddressesPayload {
 
 	# Contact the address was created for
-	contact: Contact,
+	contact: ContactUnion,
 
 	# Created address
 	address: Address,
@@ -1518,7 +1520,7 @@ input SetContactMainAddressInput {
 type SetContactMainAddressPayload {
 
 	# Contact the address was updated for
-	contact: Contact,
+	contact: ContactUnion,
 }
 
 input SetContactPostalAddressInput {
@@ -1533,7 +1535,7 @@ input SetContactPostalAddressInput {
 type SetContactPostalAddressPayload {
 
 	# Contact the address was updated for
-	contact: Contact,
+	contact: ContactUnion,
 }
 
 input UpdateAddressInput {
@@ -1586,8 +1588,11 @@ input RemoveFromContactAddressesInput {
 
 type RemoveFromContactAddressesPayload {
 
+	# Removed address id
+	addressId: ID!
+
 	# Contact the address was removed from
-	contact: Contact,
+	contact: ContactUnion,
 }
 
 
@@ -1604,7 +1609,7 @@ input AddToContactPhonesInput {
 type AddToContactPhonesPayload {
 
 	# Contact the address was created for
-	contact: Contact,
+	contact: ContactUnion,
 
 	# Created phone
 	phone: Phone,
@@ -1643,7 +1648,7 @@ input SetContactMainPhoneInput {
 type SetContactMainPhonePayload {
 
 	# Contact the phone was updated for
-	contact: Contact,
+	contact: ContactUnion,
 }
 
 input RemoveFromContactPhonesInput {
@@ -1657,8 +1662,11 @@ input RemoveFromContactPhonesInput {
 
 type RemoveFromContactPhonesPayload {
 
+	# Removed phone id
+	phoneId: ID!,
+
 	# Contact the address was removed from
-	contact: Contact,
+	contact: ContactUnion,
 }
 
 input UpdatePhoneInput {
@@ -1698,7 +1706,7 @@ input AddToContactEmailsInput {
 type AddToContactEmailsPayload {
 
 	# Contact the email address was created for
-	contact: Contact,
+	contact: ContactUnion,
 
 	# Created phone
 	email: Email,
@@ -1728,8 +1736,11 @@ input RemoveFromContactEmailsInput {
 
 type RemoveFromContactEmailsPayload {
 
+	# Removed email id
+	emailId: ID!,
+
 	# Contact the email was removed from
-	contact: Contact,
+	contact: ContactUnion,
 }
 
 input UpdateEmailInput {
@@ -1762,7 +1773,7 @@ input SetContactMainEmailInput {
 type SetContactMainEmailPayload {
 
 	# Contact the email was updated for
-	contact: Contact,
+	contact: ContactUnion,
 }
 
 input AddToContactWebsitesInput {
@@ -1778,7 +1789,7 @@ input AddToContactWebsitesInput {
 type AddToContactWebsitesPayload {
 
 	# Contact the email address was created for
-	contact: Contact,
+	contact: ContactUnion,
 
 	# Created phone
 	website: Website,
@@ -1803,8 +1814,11 @@ input RemoveFromContactWebsitesInput {
 
 type RemoveFromContactWebsitesPayload {
 
+	# Removed website id
+	websiteId: ID!,
+
 	# Contact the website was removed from
-	contact: Contact,
+	contact: ContactUnion,
 }
 
 input UpdateWebsiteInput {
@@ -1826,6 +1840,24 @@ type UpdateWebsitePayload {
 	url: String!,
 }
 
+input UpdateContactCurrentOccupationInput {
+
+	# Id of the contact to update
+	contactId: ID!,
+
+	occupation: OccupationInput
+
+}
+
+type UpdateContactCurrentOccupationPayload {
+
+	# Updated contact
+	contact: IndividualContact!,
+
+	# updated occupation
+	occupation: Occupation!,
+
+}
 
 input OccupationInput {
 
@@ -1846,6 +1878,7 @@ input MaritalStatusInput {
 	# Marital status value.
 	statusId: ID @fieldValueId(name: "MARITAL_STATUS")
 }
+
 
 input DeleteContactInput {
 
