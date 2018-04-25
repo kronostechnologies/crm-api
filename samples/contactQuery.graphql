@@ -1,0 +1,23 @@
+
+
+fragment AddressInfo on Address {
+    id,
+    line1,
+    city
+}
+
+query IndividualContact($id: ID!) {
+    node(id: $id) {
+        ... on Contact{
+            displayName,
+            addresses {... AddressInfo}
+        }
+        ... on IndividualContact {
+            firstName,
+            lastName,
+            title {
+                label
+            }
+        }
+    }
+}
