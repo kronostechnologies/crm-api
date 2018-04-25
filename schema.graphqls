@@ -500,6 +500,14 @@ type ContactSegmentation {
 	territory: FieldValue @fieldValue(type: "CONTACT_TERRITORY"),
 }
 
+type ContactNotes {
+	# Notes for the contact.
+	notes: String,
+
+	# Additional informational notes / peculiarity
+	additionnalInformations: String,
+}
+
 interface Contact {
 
 	# Contact type, form type in CRM
@@ -538,11 +546,8 @@ interface Contact {
 	# Insurance policies of the contact.
 	policies: [InsurancePolicy!]!,
 
-	# Notes for the contact.
-	notes: String,
-
-	# Additional informational notes / peculiarity
-	additionnalInformations: String,
+	# Notes and Additionnal informations notes for the contact.
+	notes: ContactNotes!,
 
 	# Date the record was modified
 	creationDate: Date,
@@ -600,11 +605,8 @@ type OrganizationContact implements Node, Contact {
 	# Insurance policies of the contact.
 	policies: [InsurancePolicy!]!,
 
-	# Notes for the contact.
-	notes: String,
-
-	# Additional informational notes / peculiarity
-	additionnalInformations: String,
+	# Notes and Additionnal informations notes for the contact.
+	notes: ContactNotes!,
 
 	# Date the record was modified
 	creationDate: Date,
@@ -720,17 +722,14 @@ type IndividualContact implements Node, Contact {
 	# Insurance policies of the contact.
 	policies: [InsurancePolicy!]!,
 
+	# Notes and Additionnal informations notes for the contact.
+	notes: ContactNotes!,
+
 	# Date the record was modified
 	creationDate: Date,
 
 	# Date the record was modified
-	lastUpdateDate: Date,
-
-	# Notes for the contact.
-	notes: String,
-
-	# Additional informational notes / peculiarity
-	additionnalInformations: String,
+	lastUpdateDate: Date
 }
 
 
@@ -1181,9 +1180,8 @@ input FieldValueFilter {
 
 input CreateIndividualContactInput {
 
-	# TODO: segmenter ou non identificaiton et info additionnel. C'est recommandé de faire de petit bloc pour évolution plus facile.
-
-	identification: CreateIndividualContactIdentificationInput,
+	# Regroup identification fields for the contact
+	identification: CreateIndividualContactIdentificationInput!,
 
 	# Regroup additionnal fields
 	additionalInfo: IndividualContactAdditionalInfoInput,
@@ -1195,28 +1193,23 @@ input CreateIndividualContactInput {
 	occupations: [OccupationInput!],
 
 	# Create Address for the contact
-	# addresses: [CreateAddressInput!], # TODO: Est-vraiment utile ou addToContactAddresses() est suffisant
+	addresses: [CreateAddressInput!],
 
 	# Create Phone for the contact
-	# phones: [CreatePhoneInput!], # TODO: Est-vraiment utile ou addToContactPhones() est suffisant
+	phones: [CreatePhoneInput!],
 
 	# Create email for the contact
-	# emails: [CreateEmailInput!], # TODO: Est-vraiment utile ou addToContactEmails() est suffisant
+	emails: [CreateEmailInput!],
 
 	# Create Website for the contact
-	# websites: [CreateWebsiteInput!], # TODO: Est-vraiment utile ou addToContactWebsites() est suffisant
+	websites: [CreateWebsiteInput!],
 
-	# Notes for the contact.
-	notes: String,
-
-	# Additional informational notes / peculiarity
-	additionnalInformations: String,
+	# Notes and Additionnal informations notes for the contact.
+	notes: ContactNotesInput,
 
 }
 
 type CreateIndividualContactPayload {
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
 
 	# Data of the created Contact
 	contact: IndividualContact
@@ -1284,17 +1277,12 @@ input UpdateIndividualContactInput {
 	# Contact occupation(s). currentOccupation will be computed.
 	occupations: [OccupationInput!],
 
-	# Notes for the contact.
-	notes: String,
-
-	# Additional informational notes / peculiarity
-	additionnalInformations: String,
+	# Notes and Additionnal informations notes for the contact.
+	notes: ContactNotesInput
 
 }
 
 type UpdateIndividualContactPayload {
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
 
 	# Data of the updated Contact
 	contact: IndividualContact
@@ -1335,16 +1323,27 @@ input UpdateIndividualContactIdentificationInput {
 
 input CreateOrganizationContactInput {
 
-	identification: CreateOrganizationContactIdentificationInput,
+	# Identification information for the organization
+	identification: CreateOrganizationContactIdentificationInput!,
 
 	# Segmentation fields
 	segmentation: ContactSegmentationInput,
 
+	# Create Phone for the contact
+	phones: [CreatePhoneInput!],
+
+	# Create email for the contact
+	emails: [CreateEmailInput!],
+
+	# Create Website for the contact
+	websites: [CreateWebsiteInput!],
+
+	# Notes and Additionnal informations notes for the contact.
+	notes: ContactNotesInput
+
 }
 
 type CreateOrganizationContactPayload {
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
 
 	# Data of the created Contact
 	contact: OrganizationContact
@@ -1379,11 +1378,11 @@ input UpdateOrganizationContactInput {
 	# Segmentation fields
 	segmentation: ContactSegmentationInput,
 
+	# Notes and Additionnal informations notes for the contact.
+	notes: ContactNotesInput
 }
 
 type UpdateOrganizationContactPayload {
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
 
 	# Data of the updated Contact
 	contact: OrganizationContact
@@ -1441,6 +1440,13 @@ input ContactSegmentationInput {
 
 }
 
+input ContactNotesInput {
+	# Notes for the contact.
+	notes: String,
+
+	# Additional informational notes / peculiarity
+	additionnalInformations: String
+}
 
 input AddToContactAddressesInput {
 	contactId: ID!,
@@ -1456,9 +1462,6 @@ input AddToContactAddressesInput {
 }
 
 type AddToContactAddressesPayload {
-
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
 
 	# Contact the address was created for
 	contact: Contact,
@@ -1506,9 +1509,6 @@ input SetContactMainAddressInput {
 
 type SetContactMainAddressPayload {
 
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
-
 	# Contact the address was updated for
 	contact: Contact,
 }
@@ -1523,9 +1523,6 @@ input SetContactPostalAddressInput {
 }
 
 type SetContactPostalAddressPayload {
-
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
 
 	# Contact the address was updated for
 	contact: Contact,
@@ -1565,9 +1562,6 @@ input UpdateAddressInput {
 
 type UpdateAddressPayload {
 
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
-
 	# The updated address
 	address: Address
 
@@ -1600,9 +1594,6 @@ input AddToContactPhonesInput {
 }
 
 type AddToContactPhonesPayload {
-
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
 
 	# Contact the address was created for
 	contact: Contact,
@@ -1643,9 +1634,6 @@ input SetContactMainPhoneInput {
 
 type SetContactMainPhonePayload {
 
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
-
 	# Contact the phone was updated for
 	contact: Contact,
 }
@@ -1684,9 +1672,6 @@ input UpdatePhoneInput {
 
 type UpdatePhonePayload {
 
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
-
 	# The updated phone
 	phone: Phone
 
@@ -1703,9 +1688,6 @@ input AddToContactEmailsInput {
 }
 
 type AddToContactEmailsPayload {
-
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
 
 	# Contact the email address was created for
 	contact: Contact,
@@ -1755,9 +1737,6 @@ input UpdateEmailInput {
 
 type UpdateEmailPayload {
 
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
-
 	# The updated email
 	email: Email
 
@@ -1774,9 +1753,6 @@ input SetContactMainEmailInput {
 
 type SetContactMainEmailPayload {
 
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
-
 	# Contact the email was updated for
 	contact: Contact,
 }
@@ -1792,9 +1768,6 @@ input AddToContactWebsitesInput {
 }
 
 type AddToContactWebsitesPayload {
-
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
 
 	# Contact the email address was created for
 	contact: Contact,
@@ -1838,9 +1811,6 @@ input UpdateWebsiteInput {
 
 type UpdateWebsitePayload {
 
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
-
 	# The updated email
 	email: Email
 
@@ -1876,6 +1846,8 @@ input DeleteContactInput {
 }
 
 type DeleteContactPayload {
-	# Mutation ID initially provided to the input mutation, or null if not provided.
-	clientMutationId: String,
+
+	# Deleted Contact Id
+	contactId: ID!,
+
 }

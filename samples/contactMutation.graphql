@@ -1,0 +1,39 @@
+
+
+mutation CreateReviewForEpisode {
+
+    createIndividualContact(input: {
+        identification: {
+            gender: MALE,
+            firstName: "asdf",
+            lastName: "asdf"
+        },
+        segmentation: {
+            seg1Id: 222
+        },
+        addresses: [
+            {
+                clientMutationId: "ADDRESS-ID-1",
+                typeId: 1,
+                line1: "123 de la rue"
+            }
+        ]
+    }){
+        contact {
+            id
+        }
+    }
+
+    setContactMainAddress(input:{
+        contactId: 111
+        addressId: 222
+    }){ clientMutationId }
+
+    createOrganizationContact(input: {
+        identification: {
+            abbreviation: "ABC inc",
+            corporationName: "Long corporation name"
+        }
+    }){contact {id}}
+
+}

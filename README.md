@@ -21,6 +21,8 @@ This project contains the GraphQL schema definition. It is not feature-complete 
 * Rename `CivilStatus` by `MaritalStatus`.
 * Rename `CIVIL_STATUS` to `MARITAL_STATUS`.
 * Split `civilStatus into `currentMaritalStatus` and `maritalStatuses`
+* Regroup `notes` and `additionnalInformations` into `ContactNote` type
+* Delete `clientMutationId` will be added later if necessary
 
 ### 2018-04-20
 

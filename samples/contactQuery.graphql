@@ -13,11 +13,14 @@ query IndividualContact($id: ID!) {
             addresses {... AddressInfo}
         }
         ... on IndividualContact {
-            firstName,
-            lastName,
-            title {
-                label
+            identification {
+                firstName,
+                lastName,
+                title {
+                    label
+                }
             }
+
         }
     }
 }
