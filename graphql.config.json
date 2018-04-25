@@ -1,0 +1,19 @@
+{
+  "schema": {
+    "file": "schema.graphqls"
+  },
+
+  "README_endpoints": "A list of GraphQL endpoints that can be queried from '.graphql' files in the IDE",
+  "endpoints" : [
+    {
+      "name": "Dev (http://dev.kronos-dev.com/crm/graphql)",
+      "url": "http://app.dev.kronos-dev.com/crm/graphql",
+      "options" : {
+        "headers": {
+          "user-agent" : "JS GraphQL"
+        }
+      }
+    }
+  ]
+
+}

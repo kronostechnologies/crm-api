@@ -1,3 +1,119 @@
+schema {
+	query: Query
+	mutation: Mutation
+}
+
+type Query {
+	# Requests a single node.
+	node(id: ID!): Node,
+
+	# Current connected user.
+	me: User,
+
+	# Requests multiple, non-detailed contacts.
+	contacts(first: Int, after: Cursor, from: Cursor, filters: ContactListFilters): ContactConnection!,
+
+	# Labels for specific group.
+	fieldValues(type: FieldValueType!, filters: FieldValueFilter): [FieldValue!]
+}
+
+type Mutation {
+	###############
+	## Contact
+
+	# Create an Individual contact
+	createIndividualContact(input: CreateIndividualContactInput!): CreateIndividualContactPayload,
+
+	# Update an individual contact
+	updateIndividualContact(input: UpdateIndividualContactInput!) : UpdateIndividualContactPayload,
+
+	# Create an organization Contact
+	createOrganizationContact(input: CreateOrganizationContactInput!): CreateOrganizationContactPayload,
+
+	# Update an organization contact
+	updateOrganizationContact(input: UpdateOrganizationContactInput!) : UpdateOrganizationContactPayload,
+
+	# Adds an address for the given contact.
+	addToContactAddresses(input: AddToContactAddressesInput!): AddToContactAddressesPayload,
+
+	# Link an existing address to a contact. (phase 2)
+	# addExistingAddressToContactAddresses(input: LinkAddressToContactInput!): LinkAddressToContactPayload
+
+	# Remove an adress from the given contact. The address will be deleted if not linked to another contact
+	removeFromContactAddresses(input: RemoveFromContactAddressesInput!): RemoveFromContactAddressesPayload,
+
+	# Update an existing address
+	updateAddress(input: UpdateAddressInput!): UpdateAddressPayload,
+
+	# Select the main address to use for a contact
+	setContactMainAddress(input: SetContactMainAddressInput!): SetContactMainAddressPayload,
+
+	# Select the main address to use for a contact
+	setContactPostalAddress(input: SetContactPostalAddressInput!): SetContactPostalAddressPayload,
+
+	# Adds an address for the given contact.
+	addToContactPhones(input: AddToContactPhonesInput!): AddToContactPhonesPayload,
+
+	# Remove a phone for the given contact.
+	removeFromContactPhones(input: RemoveFromContactPhonesInput!): RemoveFromContactPhonesPayload,
+
+	# Update an existing phone
+	updatePhone(input: UpdatePhoneInput!): UpdatePhonePayload,
+
+	# Select the main phone to use for a contact
+	setContactMainPhone(input: SetContactMainPhoneInput!): SetContactMainPhonePayload,
+
+	# Adds an address for the given contact.
+	addToContactEmails(input: AddToContactEmailsInput!): AddToContactEmailsPayload,
+
+	# Remove a email for the given contact.
+	removeFromContactEmails(input: RemoveFromContactEmailsInput!): RemoveFromContactEmailsPayload,
+
+	# Update an existing email
+	updateEmail(input: UpdateEmailInput!): UpdateEmailPayload,
+
+	# Select the main email to use for a contact
+	setContactMainEmail(input: SetContactMainEmailInput!): SetContactMainEmailPayload,
+
+	# Adds an address for the given contact.
+	addToContactWebsites(input: AddToContactWebsitesInput!): AddToContactWebsitesPayload,
+
+	# Remove a website for the given contact.
+	removeFromContactWebsites(input: RemoveFromContactWebsitesInput!): RemoveFromContactWebsitesPayload,
+
+	# Update an existing website
+	updateWebsite(input: UpdateWebsiteInput!): UpdateWebsitePayload,
+
+	# TODO phase ultérieur : addToContactOccupations().
+	# TODO phase ultérieur : removeFromContactOccupations()
+	# TODO phase ultérieur : addToContactMaritalStatuses().
+	# TODO phase ultérieur : removeFromContactMaritalStatuses()
+	# TODO phase ultérieur : addToContactCategories()
+	# TODO phase ultérieur : removeFromContactCategories()
+	# TODO phase ultérieur : addToContactDistributionLists()
+	# TODO phase ultérieur : removeFromContactDistributionLists()
+	# TODO phase ultérieur : addToContactReferredBy()
+	# TODO phase ultérieur : removeFromContactReferredBy()
+	# TODO phase ultérieur : addToContactIndustries()
+	# TODO phase ultérieur : removeFromContactIndustries()
+	# TODO phase ultérieur : addToContactHobbies()
+	# TODO phase ultérieur : removeFromContactHobbies()
+
+
+	deleteContact(input: DeleteContactInput!): DeleteContactPayload,
+
+
+	###############
+	## Event
+
+	# TODO Event Add/Update/Delete/trf en réalisé
+
+	###############
+	## Task
+
+	# TODO Task Add/Update/Delete/trf en réalisé
+}
+
 # Scalar types
 
 # Date with no time, Format: YYYY-mm-dd  (2017-12-30)
@@ -124,12 +240,6 @@ enum SortOrder {
 	DESC
 }
 
-
-
-
-# Types
-
-
 # Defines a node with an ID.
 interface Node {
 	# Unique identifier for the node.
@@ -176,7 +286,7 @@ type User implements Node {
 	id: ID!,
 
 	# Name of the user.
-	displayName: String,
+	displayName: String!,
 
 	# First name of the user.
 	firstName: String,
@@ -458,13 +568,13 @@ type OrganizationContact implements Node, Contact {
 	contactType: ContactType!,
 
 	# Display name of the contact.
-	displayName: String,
+	displayName: String!,
 
 	# Picture of the contact.
 	picture: ContactPicture,
 
 	# Regroup contact segmentation informations
-	segmentation: ContactSegmentation,
+	segmentation: ContactSegmentation!,
 
 	# Addresses of the contact.
 	addresses: [Address!]!,
@@ -492,6 +602,9 @@ type OrganizationContact implements Node, Contact {
 
 	# Notes for the contact.
 	notes: String,
+
+	# Additional informational notes / peculiarity
+	additionnalInformations: String,
 
 	# Date the record was modified
 	creationDate: Date,
@@ -578,7 +691,7 @@ type IndividualContact implements Node, Contact {
 	contactType: ContactType!,
 
 	# Display name of the contact.
-	displayName: String,
+	displayName: String!,
 
 	# Picture of the contact.
 	picture: ContactPicture,
@@ -1065,119 +1178,6 @@ input FieldValueFilter {
 	startsWith: String
 }
 
-# Main types
-type Query {
-	# Requests a single node.
-	node(id: ID!): Node,
-
-	# Current connected user.
-	me: User,
-
-	# Requests multiple, non-detailed contacts.
-	contacts(first: Int, after: Cursor, from: Cursor, filters: ContactListFilters): ContactConnection!,
-
-	# Labels for specific group.
-	fieldValues(type: FieldValueType!, filters: FieldValueFilter): [FieldValue!]
-}
-
-# Mutation types
-type Mutation {
-
-	###############
-	## Contact
-
-	# Create an Individual contact
-	createIndividualContact(input: CreateIndividualContactInput!): CreateIndividualContactPayload,
-
-	# Update an individual contact
-	updateIndividualContact(input: UpdateIndividualContactInput!) : UpdateIndividualContactPayload,
-
-	# Create an organization Contact
-	createOrganizationContact(input: CreateOrganizationContactInput!): CreateOrganizationContactPayload,
-
-	# Update an organization contact
-	updateOrganizationContact(input: UpdateOrganizationContactInput!) : UpdateOrganizationContactPayload,
-
-	# Adds an address for the given contact.
-	addToContactAddresses(input: AddToContactAddressesInput!): AddToContactAddressesPayload,
-
-	# Link an existing address to a contact. (phase 2)
-	# addExistingAddressToContactAddresses(input: LinkAddressToContactInput!): LinkAddressToContactPayload
-
-	# Remove an adress from the given contact. The address will be deleted if not linked to another contact
-	removeFromContactAddresses(input: RemoveFromContactAddressesInput!): RemoveFromContactAddressesPayload,
-
-	# Update an existing address
-	updateAddress(input: UpdateAddressInput!): UpdateAddressPayload,
-
-	# Select the main address to use for a contact
-	setContactMainAddress(input: SetContactMainAddressInput!): SetContactMainAddressPayload,
-
-	# Select the main address to use for a contact
-	setContactPostalAddress(input: SetContactPostalAddressInput!): SetContactPostalAddressPayload,
-
-	# Adds an address for the given contact.
-	addToContactPhones(input: AddToContactPhonesInput!): AddToContactPhonesPayload,
-
-	# Remove a phone for the given contact.
-	removeFromContactPhones(input: RemoveFromContactPhonesInput!): RemoveFromContactPhonesPayload,
-
-	# Update an existing phone
-	updatePhone(input: UpdatePhoneInput!): UpdatePhonePayload,
-
-	# Select the main phone to use for a contact
-	setContactMainPhone(input: SetContactMainPhoneInput!): SetContactMainPhonePayload,
-
-	# Adds an address for the given contact.
-	addToContactEmails(input: AddToContactEmailsInput!): AddToContactEmailsPayload,
-
-	# Remove a email for the given contact.
-	removeFromContactEmails(input: RemoveFromContactEmailsInput!): RemoveFromContactEmailsPayload,
-
-	# Update an existing email
-	updateEmail(input: UpdateEmailInput!): UpdateEmailPayload,
-
-	# Select the main email to use for a contact
-	setContactMainEmail(input: SetContactMainEmailInput!): SetContactMainEmailPayload,
-
-	# Adds an address for the given contact.
-	addToContactWebsites(input: AddToContactWebsitesInput!): AddToContactWebsitesPayload,
-
-	# Remove a website for the given contact.
-	removeFromContactWebsites(input: RemoveFromContactWebsitesInput!): RemoveFromContactWebsitesPayload,
-
-	# Update an existing website
-	updateWebsite(input: UpdateWebsiteInput!): UpdateWebsitePayload,
-
-	# TODO phase ultérieur : addToContactOccupations().
-	# TODO phase ultérieur : removeFromContactOccupations()
-	# TODO phase ultérieur : addToContactMaritalStatuses().
-	# TODO phase ultérieur : removeFromContactMaritalStatuses()
-	# TODO phase ultérieur : addToContactCategories()
-	# TODO phase ultérieur : removeFromContactCategories()
-	# TODO phase ultérieur : addToContactDistributionLists()
-	# TODO phase ultérieur : removeFromContactDistributionLists()
-	# TODO phase ultérieur : addToContactReferredBy()
-	# TODO phase ultérieur : removeFromContactReferredBy()
-	# TODO phase ultérieur : addToContactIndustries()
-	# TODO phase ultérieur : removeFromContactIndustries()
-	# TODO phase ultérieur : addToContactHobbies()
-	# TODO phase ultérieur : removeFromContactHobbies()
-
-
-	deleteContact(input: DeleteContactInput!): DeleteContactPayload,
-
-
-	###############
-	## Event
-
-	# TODO Event Add/Update/Delete/trf en réalisé
-
-	###############
-	## Task
-
-	# TODO Task Add/Update/Delete/trf en réalisé
-}
 
 input CreateIndividualContactInput {
 
@@ -1727,6 +1727,15 @@ input CreateEmailInput {
 	notes: String
 }
 
+input RemoveFromContactEmailsInput {
+
+	# Id of the contact to remove address from
+	contactId: ID!,
+
+	# Id of the email to delete
+	emailId: ID!,
+}
+
 type RemoveFromContactEmailsPayload {
 
 	# Contact the email was removed from
@@ -1802,6 +1811,15 @@ input CreateWebsiteInput {
 
 }
 
+input RemoveFromContactWebsitesInput {
+
+	# Id of the contact to remove address from
+	contactId: ID!,
+
+	# Id of the website to delete
+	websiteId: ID!,
+}
+
 type RemoveFromContactWebsitesPayload {
 
 	# Contact the website was removed from
@@ -1840,7 +1858,6 @@ input OccupationInput {
 	employer: String
 }
 
-
 input MaritalStatusInput {
 	# Date when the marital status starts.
 	startDate: Date,
@@ -1849,7 +1866,7 @@ input MaritalStatusInput {
 	endDate: Date,
 
 	# Marital status value.
-	status: FieldValue!
+	statusId: ID @fieldValueId(name: "MARITAL_STATUS")
 }
 
 input DeleteContactInput {
@@ -1859,5 +1876,6 @@ input DeleteContactInput {
 }
 
 type DeleteContactPayload {
+	# Mutation ID initially provided to the input mutation, or null if not provided.
+	clientMutationId: String,
 }
-
